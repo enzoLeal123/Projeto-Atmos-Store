@@ -6,44 +6,65 @@ import './Store.css';
 export default function Store() {
   const navigate = useNavigate();
   const [games, setGames] = useState([]);
-  const [genres, setGenres] = useState([]);
+  const [genres, setGenres] = useState([]); 
   const [loading, setLoading] = useState(true);
+  
+ 
   const [selectedGenre, setSelectedGenre] = useState('Todos');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('Relevancia');
 
   useEffect(() => {
     const buscarDadosDaAPI = async () => {
-      // DADOS FALSOS DE SEGURANÇA (PLANO B)
-      const mockGames = [
-        { id: 1, title: 'Cyber Warriors 2077', description: 'Um jogo de ação futurista ambientado em uma metrópole cyberpunk.', rating: 4.5, reviews: 4, genre: 'Ação', age: '18+', developer: 'NightCity Studios', price: 199.90, image: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=600&h=350' },
-        { id: 2, title: 'Fantasy Quest IX', description: 'Embarque em uma jornada épica através de reinos fantásticos.', rating: 5.0, reviews: 2, genre: 'RPG', age: '12+', developer: 'Square Legends', price: 149.90, image: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&q=80&w=600&h=350' },
-        { id: 3, title: 'Speed Racing Ultimate', description: 'A experiência definitiva de corrida com gráficos realistas e física avançada.', rating: 4.2, reviews: 7, genre: 'Corrida', age: 'Livre', developer: 'Velocity Games', price: 129.90, image: 'https://images.unsplash.com/photo-1547394765-185e1e68f34e?auto=format&fit=crop&q=80&w=600&h=350' }
-      ];
-      
-      const mockGenres = [
-        { name: 'Todos', count: 3 },
-        { name: 'Ação', count: 1 },
-        { name: 'RPG', count: 1 },
-        { name: 'Corrida', count: 1 }
-      ];
-
       try {
         setLoading(true);
         
-        // COLOQUE A URL DO SEU POSTMAN AQUI (Ex: http://localhost:3000)
-        const URL_BASE = 'https://aaa814e9-fb65-4de2-a381-b0a67e998852.mock.pstmn.io'; 
+        const respostaJogos = await axios.get(URL_BASE);
+        const jogosRecebidos = respostaJogos.data.itens || []; 
+        
+        setGames(jogosRecebidos);
 
-        const respostaJogos = await axios.get(`${URL_BASE}/jogos`);
-        const respostaGeneros = await axios.get(`${URL_BASE}/generos`);
+    
+        const contagemGeneros = {};
+        let semGeneroCount = 0;
 
-        // Verifica se a API mandou uma lista de verdade. Se sim, usa a API. Se não, usa o Plano B.
-        setGames(Array.isArray(respostaJogos.data) ? respostaJogos.data : mockGames);
-        setGenres(Array.isArray(respostaGeneros.data) ? respostaGeneros.data : mockGenres);
+        jogosRecebidos.forEach(game => {
+          const listaNomesGeneros = Array.isArray(game.generos) && game.generos.length > 0
+            ? game.generos.map(g => g.nome)
+            : [];
+          
+          if (listaNomesGeneros.length === 0) {
+            semGeneroCount++;
+          } else {
+            listaNomesGeneros.forEach(generoNome => {
+              
+              const nomeFormatado = generoNome.charAt(0).toUpperCase() + generoNome.slice(1).toLowerCase();
+              
+              if (!contagemGeneros[nomeFormatado]) {
+                contagemGeneros[nomeFormatado] = 0;
+              }
+              contagemGeneros[nomeFormatado]++;
+            });
+          }
+        });
+
+       
+        const listaSidebar = [
+          { name: 'Todos', count: jogosRecebidos.length },
+          ...Object.keys(contagemGeneros).sort().map(nome => ({
+            name: nome,
+            count: contagemGeneros[nome]
+          }))
+        ];
+
+        if (semGeneroCount > 0) {
+          listaSidebar.push({ name: 'Outros', count: semGeneroCount });
+        }
+
+        setGenres(listaSidebar);
 
       } catch (erro) {
-        // Se a API estiver desligada ou der erro de CORS, ele cai aqui e ativa o Plano B
-        console.warn("A API falhou ou está desligada. Carregando dados de segurança na tela...", erro);
-        setGames(mockGames);
-        setGenres(mockGenres);
+        console.error("Erro ao ligar à API:", erro);
       } finally {
         setLoading(false);
       }
@@ -56,10 +77,46 @@ export default function Store() {
     navigate('/');
   };
 
-  // Trava extra de segurança: o "?" garante que o filtro não quebre se a lista estiver vazia
-  const filteredGames = selectedGenre === 'Todos' 
-    ? games 
-    : games?.filter(game => game.genre === selectedGenre);
+
+  const extrairNomesGeneros = (game) => {
+    if (Array.isArray(game.generos) && game.generos.length > 0) {
+      return game.generos.map(g => g.nome); 
+    }
+    return [];
+  };
+
+  
+  let processedGames = [...games];
+
+  // 1. Filtro da Barra de Pesquisa
+  if (searchQuery.trim() !== '') {
+    processedGames = processedGames.filter(game => {
+      const titulo = String(game.titulo || '').toLowerCase();
+      const dev = String(game.desenvolvedora || '').toLowerCase();
+      const busca = searchQuery.toLowerCase();
+      return titulo.includes(busca) || dev.includes(busca);
+    });
+  }
+
+  // 2. Filtro da Barra Lateral (Gêneros)
+  if (selectedGenre !== 'Todos') {
+    processedGames = processedGames.filter(game => {
+      const listaGeneros = extrairNomesGeneros(game).map(g => g.toLowerCase());
+      
+      if (selectedGenre === 'Outros') {
+        return listaGeneros.length === 0;
+      }
+      
+      return listaGeneros.includes(selectedGenre.toLowerCase());
+    });
+  }
+
+ 
+  if (sortOption === 'A-Z') {
+    processedGames.sort((a, b) => String(a.titulo || '').localeCompare(String(b.titulo || '')));
+  } else if (sortOption === 'Z-A') {
+    processedGames.sort((a, b) => String(b.titulo || '').localeCompare(String(a.titulo || '')));
+  }
 
   return (
     <div className="store-layout">
@@ -75,7 +132,12 @@ export default function Store() {
 
         <div className="search-bar">
           <span className="search-icon">🔍</span>
-          <input type="text" placeholder="Buscar jogos, gêneros, desenvolvedores..." />
+          <input 
+            type="text" 
+            placeholder="Buscar jogos ou desenvolvedoras..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
 
         <div className="user-actions">
@@ -90,16 +152,15 @@ export default function Store() {
       </header>
 
       <div className="store-content">
-        {/* SIDEBAR - FILTROS DE GÊNERO */}
+        {/* SIDEBAR - FILTROS DINÂMICOS */}
         <aside className="sidebar">
           <h3>Filtros</h3>
           <h4 className="sidebar-subtitle">GÊNEROS</h4>
           
           <ul className="genre-list">
-            {/* O "?" aqui protege o map caso a API falhe feio */}
-            {genres?.map((genre, index) => (
+            {genres.map((genre) => (
               <li 
-                key={index} 
+                key={genre.name} 
                 className={genre.name === selectedGenre ? 'active' : ''}
                 onClick={() => setSelectedGenre(genre.name)}
               >
@@ -110,7 +171,7 @@ export default function Store() {
           </ul>
 
           <div className="games-found-badge">
-            <strong>{filteredGames?.length || 0}</strong> jogos encontrados
+            <strong>{processedGames.length}</strong> jogos exibidos
           </div>
         </aside>
 
@@ -119,57 +180,66 @@ export default function Store() {
           <div className="grid-header">
             <div className="header-titles">
               <h2>{selectedGenre === 'Todos' ? 'Todos os Jogos' : `Jogos de ${selectedGenre}`}</h2>
-              <p>Mostrando {filteredGames?.length || 0} jogos</p>
+              <p>Mostrando {processedGames.length} de {games.length} jogos do catálogo</p>
             </div>
             <div className="header-sort">
               <label>Ordenar por:</label>
-              <select>
-                <option>Relevância</option>
-                <option>Menor Preço</option>
-                <option>Maior Preço</option>
+              <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+                <option value="Relevancia">Relevância</option>
+                <option value="A-Z">Ordem Alfabética (A-Z)</option>
+                <option value="Z-A">Ordem Alfabética (Z-A)</option>
               </select>
             </div>
           </div>
           
           <div className="cards-container">
             {loading ? (
-              <p>Tentando conectar com a API...</p>
-            ) : !filteredGames || filteredGames.length === 0 ? (
-              <p className="no-games-message">Nenhum jogo cadastrado neste gênero.</p>
+              <p>Carregando catálogo do Railway...</p>
+            ) : processedGames.length === 0 ? (
+              <p className="no-games-message">Nenhum jogo encontrado com este filtro.</p>
             ) : (
-              filteredGames.map((game) => (
-                <div key={game.id || Math.random()} className="game-card">
+              processedGames.map((game) => (
+                
+                <div key={game.id} className="game-card">
                   <div className="card-image-wrapper">
-                    <img src={game.image || 'https://via.placeholder.com/600x350?text=Sem+Imagem'} alt={game.title} />
+                    
+                    <img 
+                      
+                      src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
+                      alt={game.titulo || 'Jogo'}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
+                      }}
+                    />
                   </div>
                   
                   <div className="card-info">
-                    <h4>{game.title}</h4>
-                    <p className="description">{game.description}</p>
-                    
-                    <div className="rating-area">
-                      {game.rating && (
-                        <>
-                          <span className="stars">★★★★★</span>
-                          <span className="rating-score">{Number(game.rating).toFixed(1)}</span>
-                          <span className="reviews-count">({game.reviews})</span>
-                        </>
-                      )}
-                    </div>
+                    <h4>{game.titulo || 'Jogo Desconhecido'}</h4>
+                    <p className="description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
+                    
                     <div className="tags-area">
-                      <span className="tag">{game.genre}</span>
-                      <span className="tag">{game.age}</span>
+                      {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
+                       
+                        <span key={idx} className="tag">{gen}</span>
+                      ))}
+                   
+                      {extrairNomesGeneros(game).length === 0 && (
+                        <span className="tag">Sem Gênero</span>
+                      )}
                     </div>
 
                     <div className="card-footer">
                       <div className="developer-info">
-                        <span>Desenvolvedor</span>
-                        <strong>{game.developer}</strong>
+                        <span>Desenvolvedora</span>
+                        <strong>{game.desenvolvedora || 'Não informada'}</strong>
                       </div>
+                      
+                      
                       <div className="price-info">
                         <span>Preço</span>
-                        <strong className="price-value">R$ {Number(game.price || 0).toFixed(2)}</strong>
+                        <strong className="price-value">R$ {Number(game.preco || 0).toFixed(2)}</strong>
                       </div>
                     </div>
                   </div>
