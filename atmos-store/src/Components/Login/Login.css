@@ -1,0 +1,171 @@
+.login-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #121418; /* Fundo escuro geral */
+  color: #ffffff;
+  font-family: 'Inter', system-ui, sans-serif;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* O "Card" principal que segura as duas metades */
+.login-container > div {
+  height: 600px;
+  border-radius: 16px;
+}
+
+/* PAINEL ESQUERDO (Gradiente) */
+.login-banner {
+  flex: 1;
+  max-width: 500px;
+  background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 50%, #F59E0B 100%);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.banner-content h1 {
+  font-size: 3rem;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.banner-content .subtitle {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 3rem;
+  line-height: 1.5;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feature-icon {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.8rem;
+  border-radius: 12px;
+  font-size: 1.2rem;
+}
+
+.feature-item strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.feature-item p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* PAINEL DIREITO (Formulário) */
+.login-form-section {
+  flex: 1;
+  max-width: 500px;
+  background-color: #1E1E24;
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.form-wrapper h2 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.form-subtitle {
+  color: #A0AEC0;
+  margin-bottom: 2.5rem;
+  font-size: 0.95rem;
+}
+
+.input-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.input-group label {
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #E2E8F0;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  background-color: #2D3748;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  border: 1px solid #4A5568;
+}
+
+.input-icon {
+  margin-right: 0.8rem;
+  opacity: 0.6;
+}
+
+.input-wrapper input {
+  background: transparent;
+  border: none;
+  color: white;
+  width: 100%;
+  outline: none;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  width: 100%;
+  background-color: #5A67D8;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #4C51BF;
+}
+
+.register-prompt {
+  margin-top: 2rem;
+  text-align: center;
+  color: #A0AEC0;
+  font-size: 0.9rem;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #667EEA;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
