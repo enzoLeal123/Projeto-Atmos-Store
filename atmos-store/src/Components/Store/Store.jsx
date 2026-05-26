@@ -19,6 +19,8 @@ export default function Store() {
       try {
         setLoading(true);
         
+        const URL_BASE = 'https://alunos-ads-api-production.up.railway.app/jogos?limite=100&limit=100';
+
         const respostaJogos = await axios.get(URL_BASE);
         const jogosRecebidos = respostaJogos.data.itens || []; 
         
@@ -120,7 +122,6 @@ export default function Store() {
 
   return (
     <div className="store-layout">
-      {/* HEADER GLOBAL */}
       <header className="store-header">
         <div className="logo-area">
           <div className="logo-icon-bg">🎮</div>
@@ -175,7 +176,6 @@ export default function Store() {
           </div>
         </aside>
 
-        {/* GRID PRINCIPAL DE JOGOS */}
         <main className="games-grid-area">
           <div className="grid-header">
             <div className="header-titles">
