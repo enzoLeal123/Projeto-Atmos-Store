@@ -1,12 +1,19 @@
 import React from 'react';
-import Login from './Components/Login/Login';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Login from './components/Login/Login';
+import Store from './components/Store/Store';
 
 function App() {
   return (
-    <div className="App">
-      <Login />
-    </div>
+    <Router>
+      <Routes>
+        {/* Rota inicial (Login) */}
+        <Route path="/" element={<Login />} />
+        
+        {/* Rota da Loja */}
+        <Route path="/store" element={<Store />} />
+      </Routes>
+    </Router>
   );
 }
 

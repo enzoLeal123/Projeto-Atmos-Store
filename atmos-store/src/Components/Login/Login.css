@@ -1,14 +1,13 @@
 .login-container {
   display: flex;
-  height: 100vh;
-  width: 100vw;
-  background-color: #121418; /* Fundo escuro geral */
+  min-height: 100vh;
+  width: 100%; /* Isso remove a barra de rolagem horizontal */
+  background-color: #121418;
   color: #ffffff;
   font-family: 'Inter', system-ui, sans-serif;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  box-sizing: border-box;
 }
 
 /* O "Card" principal que segura as duas metades */

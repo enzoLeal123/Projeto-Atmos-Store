@@ -1,0 +1,233 @@
+/* Layout Principal */
+.store-layout {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #121418; /* Fundo escuro igual ao seu print */
+  color: #E2E8F0;
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==================== HEADER ==================== */
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #1A1C23;
+  border-bottom: 1px solid #2D3748;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo-icon-bg {
+  background-color: #5A67D8;
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 1.5rem;
+}
+
+.logo-text h2 { margin: 0; font-size: 1.2rem; color: #fff; }
+.logo-text span { font-size: 0.75rem; color: #A0AEC0; }
+
+.search-bar {
+  position: relative;
+  width: 400px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.5rem;
+  border-radius: 8px;
+  border: 1px solid #2D3748;
+  background-color: #121418;
+  color: white;
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #A0AEC0;
+}
+
+.user-actions { display: flex; align-items: center; gap: 1rem; }
+
+.btn-library {
+  background-color: #2D3748;
+  color: white;
+  border: 1px solid #4A5568;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-avatar {
+  background-color: #F6AD55;
+  color: #1A1C23;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.btn-logout {
+  background: transparent;
+  border: 1px solid #4A5568;
+  color: white;
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ==================== CONTENT & SIDEBAR ==================== */
+.store-content {
+  display: flex;
+  flex: 1;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: #1A1C23;
+  padding: 2rem 1.5rem;
+  border-right: 1px solid #2D3748;
+}
+
+.sidebar h3 { margin-bottom: 1.5rem; font-size: 1.2rem; color: #fff; }
+.sidebar-subtitle { font-size: 0.75rem; color: #A0AEC0; margin-bottom: 1rem; letter-spacing: 1px; }
+
+.genre-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.genre-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background-color: transparent;
+  border: 1px solid #2D3748;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 0.9rem;
+}
+
+.genre-list li:hover { background-color: #2D3748; }
+
+.genre-list li.active {
+  background-color: #5A67D8; /* Azul do seu print */
+  border-color: #5A67D8;
+  color: white;
+  font-weight: bold;
+}
+
+.genre-count { opacity: 0.7; font-size: 0.8rem; }
+
+.games-found-badge {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #121418;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #A0AEC0;
+  border: 1px solid #2D3748;
+}
+.games-found-badge strong { color: white; }
+
+/* ==================== MAIN GRID AREA ==================== */
+.games-grid-area {
+  flex: 1;
+  padding: 2rem 3rem;
+}
+
+.grid-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.header-titles h2 { font-size: 2rem; margin: 0 0 0.2rem 0; color: #fff; }
+.header-titles p { margin: 0; color: #A0AEC0; font-size: 0.9rem; }
+
+.header-sort { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; }
+.header-sort select {
+  padding: 0.6rem 1rem;
+  background-color: #2D3748;
+  color: white;
+  border: 1px solid #4A5568;
+  border-radius: 6px;
+  outline: none;
+}
+
+/* ==================== CARDS ==================== */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.game-card {
+  background-color: #1A1C23;
+  border-radius: 12px;
+  border: 1px solid #2D3748;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.card-image-wrapper { height: 180px; width: 100%; }
+.card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+
+.card-info { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
+
+.card-info h4 { margin: 0 0 0.5rem 0; font-size: 1.2rem; color: #fff; }
+.description { font-size: 0.85rem; color: #A0AEC0; margin-bottom: 1rem; line-height: 1.4; min-height: 50px; }
+
+.rating-area { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; margin-bottom: 1rem; height: 20px; }
+.stars { color: #F6AD55; letter-spacing: 2px; }
+.rating-score { font-weight: bold; color: #fff; }
+.reviews-count { color: #A0AEC0; }
+
+.tags-area { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+.tag {
+  background-color: transparent;
+  border: 1px solid #4A5568;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #E2E8F0;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: auto;
+  border-top: 1px solid #2D3748;
+  padding-top: 1rem;
+}
+
+.developer-info { display: flex; flex-direction: column; font-size: 0.75rem; color: #A0AEC0; }
+.developer-info strong { color: #E2E8F0; margin-top: 0.2rem; }
+
+.price-info { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.75rem; color: #A0AEC0; }
+.price-value { color: #F6AD55; font-size: 1.2rem; margin-top: 0.2rem; font-weight: bold; }
