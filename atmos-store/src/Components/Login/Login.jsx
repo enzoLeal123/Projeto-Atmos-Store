@@ -179,7 +179,7 @@ export default function Login() {
                 <input 
                   type="text" 
                   id="matricula"
-                  placeholder="Ex: 24-12200" 
+                  placeholder="Ex: XX-XXXXX" 
                   value={matricula}
                   onChange={(e) => { setMatricula(e.target.value); setError(''); }}
                   disabled={loading}
