@@ -21,6 +21,11 @@ export default function Library() {
     localStorage.setItem('atmos_favorites', JSON.stringify(updated));
   };
 
+  // MUDANÇA: Redireciona para a tela de detalhes do jogo clicado
+  const handleVerDetalhes = (id) => {
+    navigate(`/game/${id}`);
+  };
+
   const extrairNomesGeneros = (game) => {
     if (Array.isArray(game.generos) && game.generos.length > 0) {
       return game.generos.map(g => g.nome); 
@@ -44,10 +49,12 @@ export default function Library() {
         ) : (
           favorites.map((game) => (
             <div key={game.id} className="game-card">
-              <div className="card-image-wrapper">
+              {/* MUDANÇA: Adicionado cursor pointer e clique para ver detalhes na imagem */}
+              <div className="card-image-wrapper" style={{ cursor: 'pointer' }}>
                 <img 
                   src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
                   alt={game.titulo || 'Jogo'}
+                  onClick={() => handleVerDetalhes(game.id)}
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
@@ -59,7 +66,14 @@ export default function Library() {
               </div>
               
               <div className="card-info">
-                <h4>{game.titulo || 'Jogo Desconhecido'}</h4>
+                {/* MUDANÇA: Título agora é clicável e direciona para a tela de detalhes */}
+                <h4 
+                  onClick={() => handleVerDetalhes(game.id)} 
+                  style={{ cursor: 'pointer' }}
+                  className="game-title-link"
+                >
+                  {game.titulo || 'Jogo Desconhecido'}
+                </h4>
                 <p className="description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
                 <div className="tags-area">

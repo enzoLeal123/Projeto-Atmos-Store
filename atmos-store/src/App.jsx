@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login/Login';
 import Store from './components/Store/Store';
 import Library from './components/Library/Library'; 
+import GameDetails from "./components/GameDetails/GameDetails.jsx"; // NOVO: Importando a página de detalhes
 
 // Componente que protege rotas privadas
 function RotaProtegida({ children }) {
@@ -30,12 +31,22 @@ function App() {
           }
         />
 
-        {/* MUDANÇA 2: Adicionada a rota privada da biblioteca */}
+        {/* Rota privada da biblioteca */}
         <Route
           path="/library"
           element={
             <RotaProtegida>
               <Library />
+            </RotaProtegida>
+          }
+        />
+
+        {/* NOVO: Rota privada para Detalhes do Jogo usando o ID dinâmico */}
+        <Route
+          path="/game/:id"
+          element={
+            <RotaProtegida>
+              <GameDetails />
             </RotaProtegida>
           }
         />

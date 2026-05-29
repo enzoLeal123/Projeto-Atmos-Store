@@ -99,6 +99,11 @@ export default function Store() {
     navigate('/');
   };
 
+  // NOVO: Redireciona para a tela de detalhes passando o ID do jogo na URL
+  const handleVerDetalhes = (id) => {
+    navigate(`/game/${id}`);
+  };
+
   const extrairNomesGeneros = (game) => {
     if (Array.isArray(game.generos) && game.generos.length > 0) {
       return game.generos.map(g => g.nome); 
@@ -222,16 +227,17 @@ export default function Store() {
             ) : (
               processedGames.map((game) => (
                 <div key={game.id} className="game-card">
-                  <div className="card-image-wrapper">
+                  {/* MUDANÇA: Cursor pointer para indicar clique na imagem */}
+                  <div className="card-image-wrapper" style={{ cursor: 'pointer' }}>
                     <img 
                       src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
                       alt={game.titulo || 'Jogo'}
+                      onClick={() => handleVerDetalhes(game.id)} // Clique leva para os detalhes
                       onError={(e) => {
                         e.target.onerror = null;
                         e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
                       }}
                     />
-                    {/* NOVO: Botão dinâmico de Estrela sobre a imagem */}
                     <button 
                       className={`btn-favorite ${favorites.some(fav => fav.id === game.id) ? 'is-fav' : ''}`}
                       onClick={() => toggleFavorite(game)}
@@ -241,7 +247,14 @@ export default function Store() {
                   </div>
                   
                   <div className="card-info">
-                    <h4>{game.titulo || 'Jogo Desconhecido'}</h4>
+                    {/* MUDANÇA: Título agora é clicável e tem efeito visual simples */}
+                    <h4 
+                      onClick={() => handleVerDetalhes(game.id)} 
+                      style={{ cursor: 'pointer' }}
+                      className="game-title-link"
+                    >
+                      {game.titulo || 'Jogo Desconhecido'}
+                    </h4>
                     <p className="description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
                     <div className="tags-area">
