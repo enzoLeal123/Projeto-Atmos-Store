@@ -15,6 +15,12 @@ export default function Store() {
 
   const [menuAberto, setMenuAberto] = useState(false);
 
+  // NOVO: Estado inicializado buscando os favoritos já salvos no localStorage
+  const [favorites, setFavorites] = useState(() => {
+    const saved = localStorage.getItem('atmos_favorites');
+    return saved ? JSON.parse(saved) : [];
+  });
+
   useEffect(() => {
     const buscarDadosDaAPI = async () => {
       try {
@@ -72,7 +78,18 @@ export default function Store() {
     buscarDadosDaAPI();
   }, []);
 
-  // MUDANÇA AQUI: Função que redireciona para a página da biblioteca em inglês
+  // NOVO: Função para adicionar ou remover um jogo dos favoritos
+  const toggleFavorite = (game) => {
+    let updatedFavorites;
+    if (favorites.some(fav => fav.id === game.id)) {
+      updatedFavorites = favorites.filter(fav => fav.id !== game.id);
+    } else {
+      updatedFavorites = [...favorites, game];
+    }
+    setFavorites(updatedFavorites);
+    localStorage.setItem('atmos_favorites', JSON.stringify(updatedFavorites));
+  };
+
   const handleBiblioteca = () => {
     navigate('/library');
   };
@@ -145,7 +162,6 @@ export default function Store() {
             
             {menuAberto && (
               <div className="avatar-dropdown">
-                {/* MUDANÇA AQUI: Adicionado o clique para chamar a função */}
                 <button className="dropdown-item" onClick={handleBiblioteca}>
                   <span>📚</span> Biblioteca
                 </button>
@@ -215,6 +231,13 @@ export default function Store() {
                         e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
                       }}
                     />
+                    {/* NOVO: Botão dinâmico de Estrela sobre a imagem */}
+                    <button 
+                      className={`btn-favorite ${favorites.some(fav => fav.id === game.id) ? 'is-fav' : ''}`}
+                      onClick={() => toggleFavorite(game)}
+                    >
+                      {favorites.some(fav => fav.id === game.id) ? '⭐' : '☆'}
+                    </button>
                   </div>
                   
                   <div className="card-info">

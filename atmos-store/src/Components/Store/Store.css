@@ -256,7 +256,7 @@
   min-width: 150px;
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
   padding: 6px 0;
-  z-index: 999; /* Garante que fique acima dos outros elementos */
+  z-index: 999; /* Garante que fique acima dos outros elements */
 }
 
 /* Botões de dentro do menu */
@@ -291,4 +291,69 @@
   border: 0;
   border-top: 1px solid #2d323f;
   margin: 4px 0;
+}
+
+/* ==========================================================================
+   NOVO: SISTEMA DE FAVORITOS (ESTRELAS DOURADAS)
+   ========================================================================== */
+
+/* Garante o posicionamento absoluto da estrela sobre a capa do jogo */
+.card-image-wrapper {
+  position: relative;
+}
+
+.btn-favorite {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.2s;
+  z-index: 10;
+}
+
+.btn-favorite:hover {
+  transform: scale(1.15);
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* Quando o item ESTÁ favoritado (Estrela Amarela Dourada) */
+.btn-favorite.is-fav {
+  background: rgba(234, 179, 8, 0.15); /* Fundo amarelado sutil */
+  border: 1px solid #eab308;           /* Borda amarela dourada */
+}
+
+/* Botão Jogar para a tela de Biblioteca */
+.btn-play {
+  background-color: #5A67D8; /* Usando o mesmo roxo/azul padrão da Atmos Store */
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-play:hover {
+  background-color: #4c51bf;
+  transform: translateY(-1px);
+}
+
+.no-games-message {
+  color: #A0AEC0;
+  font-size: 16px;
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 0;
 }
