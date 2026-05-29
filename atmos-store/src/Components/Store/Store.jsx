@@ -9,7 +9,6 @@ export default function Store() {
   const [genres, setGenres] = useState([]); 
   const [loading, setLoading] = useState(true);
   
- 
   const [selectedGenre, setSelectedGenre] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Relevancia');
@@ -26,7 +25,6 @@ export default function Store() {
         
         setGames(jogosRecebidos);
 
-    
         const contagemGeneros = {};
         let semGeneroCount = 0;
 
@@ -39,9 +37,7 @@ export default function Store() {
             semGeneroCount++;
           } else {
             listaNomesGeneros.forEach(generoNome => {
-              
               const nomeFormatado = generoNome.charAt(0).toUpperCase() + generoNome.slice(1).toLowerCase();
-              
               if (!contagemGeneros[nomeFormatado]) {
                 contagemGeneros[nomeFormatado] = 0;
               }
@@ -50,7 +46,6 @@ export default function Store() {
           }
         });
 
-       
         const listaSidebar = [
           { name: 'Todos', count: jogosRecebidos.length },
           ...Object.keys(contagemGeneros).sort().map(nome => ({
@@ -75,10 +70,11 @@ export default function Store() {
     buscarDadosDaAPI();
   }, []);
 
+  // Logout: remove o token e volta para o login
   const handleLogout = () => {
+    localStorage.removeItem('atmos_token');
     navigate('/');
   };
-
 
   const extrairNomesGeneros = (game) => {
     if (Array.isArray(game.generos) && game.generos.length > 0) {
@@ -87,10 +83,8 @@ export default function Store() {
     return [];
   };
 
-  
   let processedGames = [...games];
 
-  // 1. Filtro da Barra de Pesquisa
   if (searchQuery.trim() !== '') {
     processedGames = processedGames.filter(game => {
       const titulo = String(game.titulo || '').toLowerCase();
@@ -100,20 +94,16 @@ export default function Store() {
     });
   }
 
-  // 2. Filtro da Barra Lateral (Gêneros)
   if (selectedGenre !== 'Todos') {
     processedGames = processedGames.filter(game => {
       const listaGeneros = extrairNomesGeneros(game).map(g => g.toLowerCase());
-      
       if (selectedGenre === 'Outros') {
         return listaGeneros.length === 0;
       }
-      
       return listaGeneros.includes(selectedGenre.toLowerCase());
     });
   }
 
- 
   if (sortOption === 'A-Z') {
     processedGames.sort((a, b) => String(a.titulo || '').localeCompare(String(b.titulo || '')));
   } else if (sortOption === 'Z-A') {
@@ -153,7 +143,6 @@ export default function Store() {
       </header>
 
       <div className="store-content">
-        {/* SIDEBAR - FILTROS DINÂMICOS */}
         <aside className="sidebar">
           <h3>Filtros</h3>
           <h4 className="sidebar-subtitle">GÊNEROS</h4>
@@ -199,12 +188,9 @@ export default function Store() {
               <p className="no-games-message">Nenhum jogo encontrado com este filtro.</p>
             ) : (
               processedGames.map((game) => (
-                
                 <div key={game.id} className="game-card">
                   <div className="card-image-wrapper">
-                    
                     <img 
-                      
                       src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
                       alt={game.titulo || 'Jogo'}
                       onError={(e) => {
@@ -218,13 +204,10 @@ export default function Store() {
                     <h4>{game.titulo || 'Jogo Desconhecido'}</h4>
                     <p className="description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
-                    
                     <div className="tags-area">
                       {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
-                       
                         <span key={idx} className="tag">{gen}</span>
                       ))}
-                   
                       {extrairNomesGeneros(game).length === 0 && (
                         <span className="tag">Sem Gênero</span>
                       )}
@@ -235,8 +218,6 @@ export default function Store() {
                         <span>Desenvolvedora</span>
                         <strong>{game.desenvolvedora || 'Não informada'}</strong>
                       </div>
-                      
-                      
                       <div className="price-info">
                         <span>Preço</span>
                         <strong className="price-value">R$ {Number(game.preco || 0).toFixed(2)}</strong>
