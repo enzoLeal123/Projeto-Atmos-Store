@@ -1,0 +1,43 @@
+/* Container principal da página da Biblioteca */
+.library-container {
+  padding: 40px;
+  color: #ffffff;
+  background-color: #13141c; /* Fundo escuro combinando com a loja */
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Botão de Voltar para a Loja */
+.btn-back {
+  background: none;
+  border: none;
+  color: #6366f1; /* Roxo moderno */
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+/* Efeito ao passar o mouse no botão de voltar */
+.btn-back:hover {
+  color: #818cf8; /* Roxo um pouco mais claro */
+  transform: translateX(-4px); /* Dá um leve empurrãozinho para a esquerda */
+}
+
+/* Título principal */
+.library-container h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+/* Texto de descrição */
+.library-text {
+  color: #aaa;
+  font-size: 16px;
+}
