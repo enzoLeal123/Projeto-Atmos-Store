@@ -231,3 +231,64 @@
 
 .price-info { display: flex; flex-direction: column; align-items: flex-end; font-size: 0.75rem; color: #A0AEC0; }
 .price-value { color: #F6AD55; font-size: 1.2rem; margin-top: 0.2rem; font-weight: bold; }
+
+/* --- ESTILOS DO DROPDOWN DO AVATAR --- */
+
+/* Torna o container do avatar a referência para o posicionamento do menu */
+.avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Deixa o cursor com a mãozinha ao passar o mouse no avatar */
+.user-avatar {
+  cursor: pointer;
+}
+
+/* O Menu que vai flutuar abaixo do avatar */
+.avatar-dropdown {
+  position: absolute;
+  top: 125%; /* Fica logo abaixo do avatar */
+  right: 0;   /* Alinha com o lado direito */
+  background-color: #1a1d24; /* Cor escura que combina com seu layout */
+  border: 1px solid #2d323f;
+  border-radius: 8px;
+  min-width: 150px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.5);
+  padding: 6px 0;
+  z-index: 999; /* Garante que fique acima dos outros elementos */
+}
+
+/* Botões de dentro do menu */
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Efeito de passar o mouse nas opções */
+.dropdown-item:hover {
+  background-color: #2d323f;
+}
+
+/* Destaque vermelho sutil ao passar o mouse no botão Sair (Opcional) */
+.dropdown-item.logout:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* Linha separadora discreta */
+.dropdown-divider {
+  border: 0;
+  border-top: 1px solid #2d323f;
+  margin: 4px 0;
+}

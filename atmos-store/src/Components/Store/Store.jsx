@@ -13,6 +13,8 @@ export default function Store() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Relevancia');
 
+  const [menuAberto, setMenuAberto] = useState(false);
+
   useEffect(() => {
     const buscarDadosDaAPI = async () => {
       try {
@@ -70,7 +72,11 @@ export default function Store() {
     buscarDadosDaAPI();
   }, []);
 
-  // Logout: remove o token e volta para o login
+  // MUDANÇA AQUI: Função que redireciona para a página da biblioteca em inglês
+  const handleBiblioteca = () => {
+    navigate('/library');
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('atmos_token');
     navigate('/');
@@ -132,13 +138,24 @@ export default function Store() {
         </div>
 
         <div className="user-actions">
-          <button className="btn-library">
-            <span className="lib-icon">📚</span> Biblioteca
-          </button>
-          <div className="user-avatar">👤</div>
-          <button className="btn-logout" onClick={handleLogout}>
-            <span>🚪</span>
-          </button>
+          <div className="avatar-container">
+            <div className="user-avatar" onClick={() => setMenuAberto(!menuAberto)}>
+              👤
+            </div>
+            
+            {menuAberto && (
+              <div className="avatar-dropdown">
+                {/* MUDANÇA AQUI: Adicionado o clique para chamar a função */}
+                <button className="dropdown-item" onClick={handleBiblioteca}>
+                  <span>📚</span> Biblioteca
+                </button>
+                <hr className="dropdown-divider" />
+                <button className="dropdown-item logout" onClick={handleLogout}>
+                  <span>🚪</span> Sair
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 

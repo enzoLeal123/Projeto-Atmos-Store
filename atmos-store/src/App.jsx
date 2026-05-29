@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './components/Login/Login';
 import Store from './components/Store/Store';
+import Library from './components/Library/Library'; 
 
 // Componente que protege rotas privadas
 function RotaProtegida({ children }) {
@@ -25,6 +26,16 @@ function App() {
           element={
             <RotaProtegida>
               <Store />
+            </RotaProtegida>
+          }
+        />
+
+        {/* MUDANÇA 2: Adicionada a rota privada da biblioteca */}
+        <Route
+          path="/library"
+          element={
+            <RotaProtegida>
+              <Library />
             </RotaProtegida>
           }
         />
