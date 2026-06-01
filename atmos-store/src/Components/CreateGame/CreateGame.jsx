@@ -1,150 +1,91 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import "./CreateGame.css";
 
 const API_BASE = 'https://alunos-ads-api-production.up.railway.app';
 
-export default function GameDetails() {
-  const { id } = useParams();
+export default function CreateGame() {
   const navigate = useNavigate();
 
-  const [game, setGame] = useState(null);
-  const [recommendedGames, setRecommendedGames] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // Estados do formulário baseados nas classes do seu CSS
+  const [titulo, setTitulo] = useState('');
+  const [descricao, setDescricao] = useState('');
+  const [desenvolvedora, setDesenvolvedora] = useState('');
+  const [preco, setPreco] = useState('');
+  const [lancamento, setLancamento] = useState('');
+  const [capaUrl, setCapaUrl] = useState('');
+  
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState(false);
 
-  const [reviews, setReviews] = useState([]);
-  const [loadingReviews, setLoadingReviews] = useState(true);
-  const [comentario, setComentario] = useState('');
-  const [recomenda, setRecomenda] = useState(true);
-  const [enviandoReview, setEnviandoReview] = useState(false);
-  const [erroReview, setErroReview] = useState('');
-  const [sucessoReview, setSucessoReview] = useState(false);
-
-  const [favorites, setFavorites] = useState(() => {
-    const saved = localStorage.getItem('atmos_favorites');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Carrega jogo e recomendados
-  useEffect(() => {
-    const carregar = async () => {
-      try {
-        setLoading(true);
-        const resposta = await axios.get(`${API_BASE}/jogos?limite=100&limit=100`);
-        const listaJogos = resposta.data.itens || [];
-        const jogoEncontrado = listaJogos.find(g => String(g.id) === String(id));
-
-        if (jogoEncontrado) {
-          setGame(jogoEncontrado);
-
-          const generosAtuais = Array.isArray(jogoEncontrado.generos)
-            ? jogoEncontrado.generos.map(g => g.nome.toLowerCase())
-            : [];
-
-          const recomendados = listaJogos.filter(g => {
-            if (String(g.id) === String(id)) return false;
-            const outros = Array.isArray(g.generos) ? g.generos.map(gen => gen.nome.toLowerCase()) : [];
-            return outros.some(gen => generosAtuais.includes(gen));
-          });
-          setRecommendedGames(recomendados.slice(0, 3));
-        }
-      } catch (erro) {
-        console.error('Erro ao carregar jogo:', erro);
-      } finally {
-        setLoading(false);
-      }
-    };
-    carregar();
-  }, [id]);
-
-  // Carrega reviews da API
-  const carregarReviews = async () => {
-    try {
-      setLoadingReviews(true);
-      const res = await axios.get(`${API_BASE}/jogos/${id}/reviews`);
-      // A API pode retornar array direto ou dentro de .itens / .data
-      const lista = Array.isArray(res.data)
-        ? res.data
-        : res.data?.itens || res.data?.data || res.data?.reviews || [];
-      setReviews(lista);
-    } catch (erro) {
-      console.error('Erro ao carregar reviews:', erro);
-      setReviews([]);
-    } finally {
-      setLoadingReviews(false);
-    }
-  };
-
-  useEffect(() => {
-    carregarReviews();
-  }, [id]);
-
-  const toggleFavorite = () => {
-    if (!game) return;
-    const updatedFavorites = favorites.some(f => f.id === game.id)
-      ? favorites.filter(f => f.id !== game.id)
-      : [...favorites, game];
-    setFavorites(updatedFavorites);
-    localStorage.setItem('atmos_favorites', JSON.stringify(updatedFavorites));
-  };
-
-  const handleEnviarReview = async (e) => {
+  const handleCriarJogo = async (e) => {
     e.preventDefault();
-    if (!comentario.trim()) return;
-
-    setErroReview('');
-    setSucessoReview(false);
-    setEnviandoReview(true);
+    setEnviando(true);
+    setErro('');
 
     try {
       const token = localStorage.getItem('atmos_token');
+      
+      // Envia os dados para a API
       await axios.post(
-        `${API_BASE}/jogos/${id}/reviews`,
-        { comentario: comentario.trim(), recomenda },
+        `${API_BASE}/jogos`,
+        {
+          titulo: titulo.trim(),
+          descricao: descricao.trim(),
+          desenvolvedora: desenvolvedora.trim(),
+          preco: Number(preco) || 0,
+          lancamento: lancamento,
+          capaUrl: capaUrl.trim() || null,
+          generos: [] // Caso sua API exija uma array inicial de gêneros
+        },
         { headers: { token } }
       );
-      setComentario('');
-      setRecomenda(true);
-      setSucessoReview(true);
-      setTimeout(() => setSucessoReview(false), 3000);
-      // Recarrega reviews após postar
-      await carregarReviews();
+
+      setSucesso(true);
     } catch (err) {
-      const serverMsg =
-        err?.response?.data?.mensagem ||
-        err?.response?.data?.message ||
-        err?.response?.data?.erro ||
-        null;
-      setErroReview(serverMsg || 'Erro ao enviar avaliação. Tente novamente.');
+      console.error(err);
+      const msgErro = err?.response?.data?.mensagem || err?.response?.data?.erro || 'Erro ao criar o jogo. Verifique os dados.';
+      setErro(msgErro);
     } finally {
-      setEnviandoReview(false);
+      setEnviando(false);
     }
   };
 
-  if (loading) return (
-    <div className="gd-layout">
-      <div className="gd-loading">Carregando...</div>
-    </div>
-  );
-
-  if (!game) return (
-    <div className="gd-layout">
-      <div className="gd-loading">Jogo não encontrado.</div>
-    </div>
-  );
-
-  const isFavorited = favorites.some(f => f.id === game.id);
-  const totalRecomenda = reviews.filter(r => r.recomenda === true).length;
-  const pctRecomenda = reviews.length > 0 ? Math.round((totalRecomenda / reviews.length) * 100) : 0;
-
-  // Tenta extrair o nome do usuário de diferentes formatos da API
-  const getNomeUsuario = (rev) =>
-    rev.usuario?.nome || rev.usuario?.name || rev.nomeUsuario || rev.autor || 'Jogador Anônimo';
+  // Se o jogo foi criado com sucesso, exibe a tela de sucesso configurada no seu CSS
+  if (sucesso) {
+    return (
+      <div className="cg-layout">
+        <div className="cg-success-screen">
+          <div className="cg-success-card">
+            <div className="cg-success-icon">🎉</div>
+            <h2>Jogo Criado!</h2>
+            <p>O jogo <strong>{titulo}</strong> foi adicionado com sucesso ao catálogo.</p>
+            <div className="cg-success-actions">
+              <button className="cg-btn-primary" onClick={() => navigate('/store')}>
+                Ir para a Loja
+              </button>
+              <button className="cg-btn-secondary" onClick={() => {
+                setSucesso(false);
+                setTitulo('');
+                setDescricao('');
+                setDesenvolvedora('');
+                setPreco('');
+                setLancamento('');
+                setCapaUrl('');
+              }}>
+                Criar outro jogo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="gd-layout">
-
+    <div className="cg-layout">
       {/* ── HEADER ── */}
       <header className="store-header">
         <div className="logo-area" style={{ cursor: 'pointer' }} onClick={() => navigate('/store')}>
@@ -154,193 +95,114 @@ export default function GameDetails() {
             <span>Game Store</span>
           </div>
         </div>
-        <button className="gd-btn-back" onClick={() => navigate('/store')}>
-          ← Voltar para a Loja
+        <button className="cg-btn-back" onClick={() => navigate('/store')}>
+          ← Cancelar
         </button>
       </header>
 
-      {/* ── HERO ── */}
-      <div className="gd-hero">
-        <img
-          src={game.capaUrl || 'https://placehold.co/1200x400/2D3748/A0AEC0?text=Sem+Capa'}
-          alt={game.titulo}
-          className="gd-hero-img"
-          onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/1200x400/2D3748/A0AEC0?text=Sem+Capa'; }}
-        />
-        <div className="gd-hero-overlay" />
-      </div>
-
-      {/* ── CONTEÚDO PRINCIPAL ── */}
-      <div className="gd-content">
-
-        <div className="gd-main-col">
-          <div className="gd-title-row">
-            <div>
-              <span className="gd-dev">{game.desenvolvedora || 'Estúdio Indie'}</span>
-              <h1 className="gd-title">{game.titulo}</h1>
-            </div>
-            <button
-              className={`gd-btn-fav ${isFavorited ? 'is-fav' : ''}`}
-              onClick={toggleFavorite}
-              title={isFavorited ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-            >
-              {isFavorited ? '⭐' : '☆'}
-            </button>
-          </div>
-
-          <div className="gd-tags">
-            {Array.isArray(game.generos) && game.generos.map((g, i) => (
-              <span key={i} className="tag">{g.nome}</span>
-            ))}
-          </div>
-
-          <p className="gd-description">{game.descricao || 'Sem descrição cadastrada.'}</p>
-
-          <div className="gd-buy-card">
-            <div className="gd-price-block">
-              <span className="gd-price-label">Preço</span>
-              <strong className="gd-price">R$ {Number(game.preco || 0).toFixed(2)}</strong>
-            </div>
-            <button className="gd-btn-buy">Comprar Agora</button>
-          </div>
-
-          {reviews.length > 0 && (
-            <div className="gd-score-bar">
-              <span className="gd-score-label">
-                {pctRecomenda >= 80 ? '👍 Muito Positivo' : pctRecomenda >= 50 ? '😐 Misto' : '👎 Negativo'}
-              </span>
-              <span className="gd-score-pct">{pctRecomenda}% recomendam ({reviews.length} avaliações)</span>
-              <div className="gd-score-track">
-                <div className="gd-score-fill" style={{ width: `${pctRecomenda}%` }} />
+      {/* ── CONTEÚDO ── */}
+      <div className="cg-content">
+        {/* Sidebar de Dicas */}
+        <aside className="cg-sidebar">
+          <h3>Novo Jogo</h3>
+          <p>Preencha os dados ao lado para disponibilizar o seu jogo na Atmos Store de Muriaé.</p>
+          <div className="cg-tips">
+            <div className="cg-tip">
+              <span>💡</span>
+              <div>
+                <strong>Imagens de Capa</strong>
+                <p>Utilize links de imagens hospedadas (ex: Imgur, Unsplash) para a capa aparecer corretamente.</p>
               </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* Formulário */}
+        <form className="cg-form" onSubmit={handleCriarJogo}>
+          <h2>Cadastrar Jogo</h2>
+
+          <div className="cg-field">
+            <label>TÍTULO DO JOGO <span className="cg-required">*</span></label>
+            <input 
+              type="text" 
+              required 
+              placeholder="Ex: Sekiro: Shadows Die Twice" 
+              value={titulo}
+              onChange={e => setTitulo(e.target.value)}
+            />
+          </div>
+
+          <div className="cg-field">
+            <label>DESENVOLVEDORA <span className="cg-required">*</span></label>
+            <input 
+              type="text" 
+              required 
+              placeholder="Ex: FromSoftware" 
+              value={desenvolvedora}
+              onChange={e => setDesenvolvedora(e.target.value)}
+            />
+          </div>
+
+          <div className="cg-row">
+            <div className="cg-field">
+              <label>PREÇO (R$) <span className="cg-required">*</span></label>
+              <input 
+                type="number" 
+                step="0.01" 
+                required 
+                placeholder="0.00" 
+                value={preco}
+                onChange={e => setPreco(e.target.value)}
+              />
+            </div>
+            <div className="cg-field">
+              <label>DATA DE LANÇAMENTO</label>
+              <input 
+                type="text" 
+                placeholder="Ex: 22/03/2019" 
+                value={lancamento}
+                onChange={e => setLancamento(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="cg-field">
+            <label>URL DA CAPA</label>
+            <input 
+              type="url" 
+              placeholder="https://exemplo.com/imagem.jpg" 
+              value={capaUrl}
+              onChange={e => setCapaUrl(e.target.value)}
+            />
+          </div>
+
+          <div className="cg-field">
+            <label>DESCRIÇÃO <span className="cg-required">*</span></label>
+            <textarea 
+              required 
+              placeholder="Fale um pouco sobre a história e mecânicas do jogo..." 
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
+            />
+          </div>
+
+          {erro && (
+            <div className="cg-error">
+              <span>⚠️</span>
+              <p>{erro}</p>
             </div>
           )}
-        </div>
 
-        <div className="gd-side-col">
-          <div className="gd-info-card">
-            <h3>Informações</h3>
-            <div className="gd-info-row">
-              <span>Desenvolvedora</span>
-              <strong>{game.desenvolvedora || '—'}</strong>
-            </div>
-            <div className="gd-info-row">
-              <span>Gêneros</span>
-              <strong>{Array.isArray(game.generos) && game.generos.length > 0 ? game.generos.map(g => g.nome).join(', ') : '—'}</strong>
-            </div>
-            <div className="gd-info-row">
-              <span>Lançamento</span>
-              <strong>{game.lancamento || '—'}</strong>
-            </div>
-            <div className="gd-info-row">
-              <span>Preço</span>
-              <strong className="gd-info-price">R$ {Number(game.preco || 0).toFixed(2)}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* ── AVALIAÇÕES ── */}
-      <div className="gd-reviews-section">
-        <h2>Avaliações dos Usuários</h2>
-
-        <div className="gd-reviews-grid">
-
-          {/* Formulário */}
-          <form className="gd-review-form" onSubmit={handleEnviarReview}>
-            <h3>Deixe sua análise</h3>
-
-            <p className="gd-form-label">Você recomenda este jogo?</p>
-            <div className="gd-rec-buttons">
-              <button type="button" className={`gd-btn-rec yes ${recomenda === true ? 'active' : ''}`} onClick={() => setRecomenda(true)}>
-                👍 Sim, recomendo
-              </button>
-              <button type="button" className={`gd-btn-rec no ${recomenda === false ? 'active' : ''}`} onClick={() => setRecomenda(false)}>
-                👎 Não recomendo
-              </button>
-            </div>
-
-            <p className="gd-form-label">Escreva sua análise:</p>
-            <textarea
-              rows="5"
-              placeholder="Conte para a comunidade o que você achou do jogo..."
-              value={comentario}
-              onChange={e => { setComentario(e.target.value); setErroReview(''); }}
-              className="gd-textarea"
-              required
-            />
-
-            {erroReview && (
-              <div className="gd-review-error">
-                <span>⚠️</span>
-                <p>{erroReview}</p>
-              </div>
-            )}
-
-            {sucessoReview && (
-              <div className="gd-review-success">
-                <span>✅</span>
-                <p>Avaliação publicada com sucesso!</p>
-              </div>
-            )}
-
-            <button type="submit" className="gd-btn-submit" disabled={enviandoReview}>
-              {enviandoReview ? 'Enviando...' : 'Publicar Análise'}
+          <div className="cg-actions">
+            <button type="button" className="cg-btn-secondary" onClick={() => navigate('/store')} disabled={enviando}>
+              Cancelar
             </button>
-          </form>
-
-          {/* Lista de reviews */}
-          <div className="gd-reviews-list">
-            <h3>
-              Análises mais recentes
-              {!loadingReviews && <span className="gd-reviews-count"> ({reviews.length})</span>}
-            </h3>
-
-            <div className="gd-reviews-scroll">
-              {loadingReviews ? (
-                <p className="gd-no-reviews">Carregando avaliações...</p>
-              ) : reviews.length === 0 ? (
-                <p className="gd-no-reviews">Ainda não há avaliações. Seja o primeiro! 🎮</p>
-              ) : (
-                reviews.map((rev, idx) => (
-                  <div key={rev.id || idx} className="gd-review-card">
-                    <div className="gd-review-header">
-                      <span className="gd-review-user">👤 {getNomeUsuario(rev)}</span>
-                      <span className={`gd-review-badge ${rev.recomenda ? 'badge-yes' : 'badge-no'}`}>
-                        {rev.recomenda ? '👍 RECOMENDA' : '👎 NÃO RECOMENDA'}
-                      </span>
-                    </div>
-                    <p className="gd-review-text">"{rev.comentario}"</p>
-                  </div>
-                ))
-              )}
-            </div>
+            <button type="submit" className="cg-btn-primary" disabled={enviando}>
+              {enviando ? 'Salvando...' : 'Salvar Jogo'}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
-
-      {/* ── RECOMENDAÇÕES ── */}
-      {recommendedGames.length > 0 && (
-        <div className="gd-recommendations">
-          <h2>Você também pode gostar</h2>
-          <div className="gd-rec-grid">
-            {recommendedGames.map(rec => (
-              <div key={rec.id} className="gd-rec-card" onClick={() => navigate(`/game/${rec.id}`)}>
-                <img
-                  src={rec.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'}
-                  alt={rec.titulo}
-                  onError={e => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'; }}
-                />
-                <div className="gd-rec-info">
-                  <h4>{rec.titulo}</h4>
-                  <span>R$ {Number(rec.preco || 0).toFixed(2)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
