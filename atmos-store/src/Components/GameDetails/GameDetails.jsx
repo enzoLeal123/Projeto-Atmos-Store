@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import './GameDetails.css';
 
 const API_BASE = 'https://alunos-ads-api-production.up.railway.app';
 
@@ -13,15 +14,19 @@ export default function GameDetails() {
   const [loading, setLoading] = useState(true);
 
   const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(true);
   const [comentario, setComentario] = useState('');
   const [recomenda, setRecomenda] = useState(true);
   const [enviandoReview, setEnviandoReview] = useState(false);
+  const [erroReview, setErroReview] = useState('');
+  const [sucessoReview, setSucessoReview] = useState(false);
 
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('atmos_favorites');
     return saved ? JSON.parse(saved) : [];
   });
 
+  // Carrega jogo e recomendados
   useEffect(() => {
     const carregar = async () => {
       try {
@@ -43,12 +48,6 @@ export default function GameDetails() {
             return outros.some(gen => generosAtuais.includes(gen));
           });
           setRecommendedGames(recomendados.slice(0, 3));
-
-          // Mock de reviews enquanto não conectamos à API
-          setReviews([
-            { id: 1, usuario: 'Jogador_Atmos', recomenda: true, comentario: 'Muito bom! Gráficos excelentes e ótima otimização.' },
-            { id: 2, usuario: 'Anônimo', recomenda: false, comentario: 'História legal, mas achei que tem muitos bugs no lançamento.' },
-          ]);
         }
       } catch (erro) {
         console.error('Erro ao carregar jogo:', erro);
@@ -57,6 +56,28 @@ export default function GameDetails() {
       }
     };
     carregar();
+  }, [id]);
+
+  // Carrega reviews da API
+  const carregarReviews = async () => {
+    try {
+      setLoadingReviews(true);
+      const res = await axios.get(`${API_BASE}/jogos/${id}/reviews`);
+      // A API pode retornar array direto ou dentro de .itens / .data
+      const lista = Array.isArray(res.data)
+        ? res.data
+        : res.data?.itens || res.data?.data || res.data?.reviews || [];
+      setReviews(lista);
+    } catch (erro) {
+      console.error('Erro ao carregar reviews:', erro);
+      setReviews([]);
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarReviews();
   }, [id]);
 
   const toggleFavorite = () => {
@@ -71,10 +92,34 @@ export default function GameDetails() {
   const handleEnviarReview = async (e) => {
     e.preventDefault();
     if (!comentario.trim()) return;
+
+    setErroReview('');
+    setSucessoReview(false);
     setEnviandoReview(true);
-    setReviews(prev => [...prev, { id: Date.now(), usuario: 'Você', recomenda, comentario }]);
-    setComentario('');
-    setEnviandoReview(false);
+
+    try {
+      const token = localStorage.getItem('atmos_token');
+      await axios.post(
+        `${API_BASE}/jogos/${id}/reviews`,
+        { comentario: comentario.trim(), recomenda },
+        { headers: { token } }
+      );
+      setComentario('');
+      setRecomenda(true);
+      setSucessoReview(true);
+      setTimeout(() => setSucessoReview(false), 3000);
+      // Recarrega reviews após postar
+      await carregarReviews();
+    } catch (err) {
+      const serverMsg =
+        err?.response?.data?.mensagem ||
+        err?.response?.data?.message ||
+        err?.response?.data?.erro ||
+        null;
+      setErroReview(serverMsg || 'Erro ao enviar avaliação. Tente novamente.');
+    } finally {
+      setEnviandoReview(false);
+    }
   };
 
   if (loading) return (
@@ -90,8 +135,12 @@ export default function GameDetails() {
   );
 
   const isFavorited = favorites.some(f => f.id === game.id);
-  const totalRecomenda = reviews.filter(r => r.recomenda).length;
+  const totalRecomenda = reviews.filter(r => r.recomenda === true).length;
   const pctRecomenda = reviews.length > 0 ? Math.round((totalRecomenda / reviews.length) * 100) : 0;
+
+  // Tenta extrair o nome do usuário de diferentes formatos da API
+  const getNomeUsuario = (rev) =>
+    rev.usuario?.nome || rev.usuario?.name || rev.nomeUsuario || rev.autor || 'Jogador Anônimo';
 
   return (
     <div className="gd-layout">
@@ -124,9 +173,7 @@ export default function GameDetails() {
       {/* ── CONTEÚDO PRINCIPAL ── */}
       <div className="gd-content">
 
-        {/* Coluna esquerda — info + compra */}
         <div className="gd-main-col">
-
           <div className="gd-title-row">
             <div>
               <span className="gd-dev">{game.desenvolvedora || 'Estúdio Indie'}</span>
@@ -149,7 +196,6 @@ export default function GameDetails() {
 
           <p className="gd-description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
-          {/* Card de compra */}
           <div className="gd-buy-card">
             <div className="gd-price-block">
               <span className="gd-price-label">Preço</span>
@@ -158,7 +204,6 @@ export default function GameDetails() {
             <button className="gd-btn-buy">Comprar Agora</button>
           </div>
 
-          {/* Resumo de avaliações */}
           {reviews.length > 0 && (
             <div className="gd-score-bar">
               <span className="gd-score-label">
@@ -172,7 +217,6 @@ export default function GameDetails() {
           )}
         </div>
 
-        {/* Coluna direita — info extra */}
         <div className="gd-side-col">
           <div className="gd-info-card">
             <h3>Informações</h3>
@@ -183,6 +227,10 @@ export default function GameDetails() {
             <div className="gd-info-row">
               <span>Gêneros</span>
               <strong>{Array.isArray(game.generos) && game.generos.length > 0 ? game.generos.map(g => g.nome).join(', ') : '—'}</strong>
+            </div>
+            <div className="gd-info-row">
+              <span>Lançamento</span>
+              <strong>{game.lancamento || '—'}</strong>
             </div>
             <div className="gd-info-row">
               <span>Preço</span>
@@ -204,18 +252,10 @@ export default function GameDetails() {
 
             <p className="gd-form-label">Você recomenda este jogo?</p>
             <div className="gd-rec-buttons">
-              <button
-                type="button"
-                className={`gd-btn-rec yes ${recomenda === true ? 'active' : ''}`}
-                onClick={() => setRecomenda(true)}
-              >
+              <button type="button" className={`gd-btn-rec yes ${recomenda === true ? 'active' : ''}`} onClick={() => setRecomenda(true)}>
                 👍 Sim, recomendo
               </button>
-              <button
-                type="button"
-                className={`gd-btn-rec no ${recomenda === false ? 'active' : ''}`}
-                onClick={() => setRecomenda(false)}
-              >
+              <button type="button" className={`gd-btn-rec no ${recomenda === false ? 'active' : ''}`} onClick={() => setRecomenda(false)}>
                 👎 Não recomendo
               </button>
             </div>
@@ -225,10 +265,24 @@ export default function GameDetails() {
               rows="5"
               placeholder="Conte para a comunidade o que você achou do jogo..."
               value={comentario}
-              onChange={e => setComentario(e.target.value)}
+              onChange={e => { setComentario(e.target.value); setErroReview(''); }}
               className="gd-textarea"
               required
             />
+
+            {erroReview && (
+              <div className="gd-review-error">
+                <span>⚠️</span>
+                <p>{erroReview}</p>
+              </div>
+            )}
+
+            {sucessoReview && (
+              <div className="gd-review-success">
+                <span>✅</span>
+                <p>Avaliação publicada com sucesso!</p>
+              </div>
+            )}
 
             <button type="submit" className="gd-btn-submit" disabled={enviandoReview}>
               {enviandoReview ? 'Enviando...' : 'Publicar Análise'}
@@ -237,15 +291,21 @@ export default function GameDetails() {
 
           {/* Lista de reviews */}
           <div className="gd-reviews-list">
-            <h3>Análises mais recentes</h3>
+            <h3>
+              Análises mais recentes
+              {!loadingReviews && <span className="gd-reviews-count"> ({reviews.length})</span>}
+            </h3>
+
             <div className="gd-reviews-scroll">
-              {reviews.length === 0 ? (
-                <p className="gd-no-reviews">Ainda não há avaliações para este jogo.</p>
+              {loadingReviews ? (
+                <p className="gd-no-reviews">Carregando avaliações...</p>
+              ) : reviews.length === 0 ? (
+                <p className="gd-no-reviews">Ainda não há avaliações. Seja o primeiro! 🎮</p>
               ) : (
-                reviews.map(rev => (
-                  <div key={rev.id} className="gd-review-card">
+                reviews.map((rev, idx) => (
+                  <div key={rev.id || idx} className="gd-review-card">
                     <div className="gd-review-header">
-                      <span className="gd-review-user">👤 {rev.usuario}</span>
+                      <span className="gd-review-user">👤 {getNomeUsuario(rev)}</span>
                       <span className={`gd-review-badge ${rev.recomenda ? 'badge-yes' : 'badge-no'}`}>
                         {rev.recomenda ? '👍 RECOMENDA' : '👎 NÃO RECOMENDA'}
                       </span>
