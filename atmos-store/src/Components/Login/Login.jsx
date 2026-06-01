@@ -56,7 +56,10 @@ export default function Login() {
         });
 
         const token = loginRes.data?.token || loginRes.data?.accessToken || loginRes.data?.access_token;
-        if (token) localStorage.setItem('atmos_token', token);
+        if (token) {
+          localStorage.setItem('atmos_token', token);
+          localStorage.setItem('atmos_matricula', matricula.trim()); // Salva de forma dinâmica para a biblioteca
+        }
         navigate('/store');
 
       } else {
@@ -67,7 +70,10 @@ export default function Login() {
         });
 
         const token = res.data?.token || res.data?.accessToken || res.data?.access_token;
-        if (token) localStorage.setItem('atmos_token', token);
+        if (token) {
+          localStorage.setItem('atmos_token', token);
+          localStorage.setItem('atmos_matricula', matricula.trim()); // Salva de forma dinâmica para a biblioteca
+        }
         navigate('/store');
       }
     } catch (err) {
@@ -109,149 +115,156 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      {/* PAINEL ESQUERDO */}
-      <div className="login-banner">
-        <div className="banner-content">
-          <div className="logo-icon">🎮</div>
-          <h1>Atmos Store</h1>
-          <p className="subtitle">Sua biblioteca de jogos na nuvem. Milhares de títulos esperando por você.</p>
-          
-          <div className="features-list">
-            <div className="feature-item">
-              <span className="feature-icon">✨</span>
-              <div>
-                <strong>Biblioteca Infinita</strong>
-                <p>Acesse seus jogos de qualquer lugar</p>
+      <div className="login-card-wrapper" style={{ display: 'flex', width: '1000px', maxWidth: '100%', height: '600px', borderRadius: '16px', overflow: 'hidden', boxShadow: 'var(--shadow-premium)', border: '1px solid var(--border-suave)' }}>
+        
+        {/* PAINEL ESQUERDO */}
+        <div className="login-banner">
+          <div className="banner-content">
+            <div className="login-logo-icon" style={{ fontSize: '2rem', marginBottom: '1rem' }}>🎮</div>
+            <h1>Atmos Store</h1>
+            <p className="subtitle">Sua biblioteca de jogos na nuvem. Milhares de títulos esperando por você.</p>
+            
+            <div className="features-list">
+              <div className="feature-item">
+                <span className="feature-icon">✨</span>
+                <div>
+                  <strong>Biblioteca Infinita</strong>
+                  <p>Acesse seus jogos de qualquer lugar</p>
+                </div>
               </div>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">👥</span>
-              <div>
-                <strong>Comunidade Ativa</strong>
-                <p>Compartilhe reviews e descubra novos jogos</p>
+              <div className="feature-item">
+                <span className="feature-icon">👥</span>
+                <div>
+                  <strong>Comunidade Ativa</strong>
+                  <p>Compartilhe reviews e descubra novos jogos</p>
+                </div>
               </div>
-            </div>
-            <div className="feature-item">
-              <span className="feature-icon">🏆</span>
-              <div>
-                <strong>Ofertas Exclusivas</strong>
-                <p>Descontos especiais para membros</p>
+              <div className="feature-item">
+                <span className="feature-icon">🏆</span>
+                <div>
+                  <strong>Ofertas Exclusivas</strong>
+                  <p>Descontos especiais para membros</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* PAINEL DIREITO */}
-      <div className="login-form-section">
-        <div className="form-wrapper">
-          
-          <h2>{isRegisterMode ? 'Criar nova conta' : 'Bem-vindo de volta'}</h2>
-          <p className="form-subtitle">
-            {isRegisterMode 
-              ? 'Junte-se à Atmos Store e comece sua jornada' 
-              : 'Entre com suas credenciais para continuar'}
-          </p>
+        {/* PAINEL DIREITO */}
+        <div className="login-form-section">
+          <div className="form-wrapper">
+            
+            <h2>{isRegisterMode ? 'Criar nova conta' : 'Bem-vindo de volta'}</h2>
+            <p className="form-subtitle">
+              {isRegisterMode 
+                ? 'Junte-se à Atmos Store e comece sua jornada' 
+                : 'Entre com suas credenciais para continuar'}
+            </p>
 
-          <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit}>
 
-            {isRegisterMode && (
+              {isRegisterMode && (
+                <div className="input-group">
+                  <label htmlFor="name">NOME COMPLETO</label>
+                  <div className="input-wrapper">
+                    <span className="input-icon">👤</span>
+                    <input 
+                      type="text" 
+                      id="name"
+                      placeholder="Seu nome" 
+                      autoComplete="name"
+                      value={name}
+                      onChange={(e) => { setName(e.target.value); setError(''); }}
+                      disabled={loading}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div className="input-group">
-                <label htmlFor="name">NOME COMPLETO</label>
+                <label htmlFor="matricula">MATRÍCULA</label>
                 <div className="input-wrapper">
-                  <span className="input-icon">👤</span>
+                  <span className="input-icon">🪪</span>
                   <input 
                     type="text" 
-                    id="name"
-                    placeholder="Seu nome" 
-                    value={name}
-                    onChange={(e) => { setName(e.target.value); setError(''); }}
+                    id="matricula"
+                    placeholder="Ex: XX-XXXXX" 
+                    autoComplete="username"
+                    value={matricula}
+                    onChange={(e) => { setMatricula(e.target.value); setError(''); }}
                     disabled={loading}
                   />
                 </div>
               </div>
-            )}
 
-            <div className="input-group">
-              <label htmlFor="matricula">MATRÍCULA</label>
-              <div className="input-wrapper">
-                <span className="input-icon">🪪</span>
-                <input 
-                  type="text" 
-                  id="matricula"
-                  placeholder="Ex: XX-XXXXX" 
-                  value={matricula}
-                  onChange={(e) => { setMatricula(e.target.value); setError(''); }}
-                  disabled={loading}
-                />
+              <div className="input-group">
+                <label htmlFor="password">SENHA</label>
+                <div className="input-wrapper">
+                  <span className="input-icon">🔒</span>
+                  <input 
+                    type="password" 
+                    id="password"
+                    placeholder="••••••••" 
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => { setPassword(e.target.value); setError(''); }}
+                    disabled={loading}
+                  />
+                </div>
               </div>
+
+              {error && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                  border: '1px solid rgba(239, 68, 68, 0.3)',
+                  borderRadius: '8px',
+                  padding: '0.75rem 1rem',
+                  marginTop: '0.75rem',
+                  animation: shake ? 'shake 0.4s ease' : 'none',
+                }}>
+                  <span style={{ fontSize: '1rem' }}>⚠️</span>
+                  <p style={{ color: '#ef4444', fontSize: '0.85rem', margin: 0, fontWeight: '500' }}>
+                    {error}
+                  </p>
+                </div>
+              )}
+
+              <style>{`
+                @keyframes shake {
+                  0%   { transform: translateX(0); }
+                  20%  { transform: translateX(-8px); }
+                  40%  { transform: translateX(8px); }
+                  60%  { transform: translateX(-5px); }
+                  80%  { transform: translateX(5px); }
+                  100% { transform: translateX(0); }
+                }
+              `}</style>
+
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading
+                  ? (isRegisterMode ? 'Cadastrando...' : 'Entrando...')
+                  : (isRegisterMode ? 'Cadastrar' : 'Entrar')}
+              </button>
+            </form>
+
+            <div className="register-prompt">
+              <p>{isRegisterMode ? 'Já possui uma conta?' : 'Não possui uma conta?'}</p>
+              <button 
+                type="button" 
+                className="btn-link" 
+                onClick={toggleMode}
+                disabled={loading}
+              >
+                {isRegisterMode ? 'Fazer Login' : 'Criar Conta Grátis'}
+              </button>
             </div>
 
-            <div className="input-group">
-              <label htmlFor="password">SENHA</label>
-              <div className="input-wrapper">
-                <span className="input-icon">🔒</span>
-                <input 
-                  type="password" 
-                  id="password"
-                  placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(''); }}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {error && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                backgroundColor: 'rgba(252, 129, 129, 0.12)',
-                border: '1px solid rgba(252, 129, 129, 0.4)',
-                borderRadius: '8px',
-                padding: '0.75rem 1rem',
-                marginTop: '0.75rem',
-                animation: shake ? 'shake 0.4s ease' : 'none',
-              }}>
-                <span style={{ fontSize: '1rem' }}>⚠️</span>
-                <p style={{ color: '#FC8181', fontSize: '0.85rem', margin: 0 }}>
-                  {error}
-                </p>
-              </div>
-            )}
-
-            <style>{`
-              @keyframes shake {
-                0%   { transform: translateX(0); }
-                20%  { transform: translateX(-8px); }
-                40%  { transform: translateX(8px); }
-                60%  { transform: translateX(-5px); }
-                80%  { transform: translateX(5px); }
-                100% { transform: translateX(0); }
-              }
-            `}</style>
-
-            <button type="submit" className="btn-primary" disabled={loading}>
-              {loading
-                ? (isRegisterMode ? 'Cadastrando...' : 'Entrando...')
-                : (isRegisterMode ? 'Cadastrar' : 'Entrar')}
-            </button>
-          </form>
-
-          <div className="register-prompt">
-            <p>{isRegisterMode ? 'Já possui uma conta?' : 'Não possui uma conta?'}</p>
-            <button 
-              type="button" 
-              className="btn-link" 
-              onClick={toggleMode}
-              disabled={loading}
-            >
-              {isRegisterMode ? 'Fazer Login' : 'Criar Conta Grátis'}
-            </button>
           </div>
-
         </div>
+
       </div>
     </div>
   );

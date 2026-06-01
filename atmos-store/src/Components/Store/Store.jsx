@@ -15,7 +15,7 @@ export default function Store() {
 
   const [menuAberto, setMenuAberto] = useState(false);
 
-  // NOVO: Estado inicializado buscando os favoritos já salvos no localStorage
+  // Busca os favoritos já salvos no localStorage
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('atmos_favorites');
     return saved ? JSON.parse(saved) : [];
@@ -78,7 +78,6 @@ export default function Store() {
     buscarDadosDaAPI();
   }, []);
 
-  // NOVO: Função para adicionar ou remover um jogo dos favoritos
   const toggleFavorite = (game) => {
     let updatedFavorites;
     if (favorites.some(fav => fav.id === game.id)) {
@@ -91,17 +90,12 @@ export default function Store() {
   };
 
   const handleCriarJogo = () => { navigate("/create-game"); };
-
-  const handleBiblioteca = () => {
-    navigate('/library');
-  };
-
+  const handleBiblioteca = () => { navigate('/library'); };
   const handleLogout = () => {
     localStorage.removeItem('atmos_token');
     navigate('/');
   };
 
-  // NOVO: Redireciona para a tela de detalhes passando o ID do jogo na URL
   const handleVerDetalhes = (id) => {
     navigate(`/game/${id}`);
   };
@@ -141,9 +135,10 @@ export default function Store() {
   }
 
   return (
-    <div className="store-layout">
+    <div className="store-container">
+      {/* ── HEADER PADRONIZADO GLOBAL ── */}
       <header className="store-header">
-        <div className="logo-area">
+        <div className="logo-area" style={{ cursor: 'pointer' }} onClick={() => navigate('/store')}>
           <div className="logo-icon-bg">🎮</div>
           <div className="logo-text">
             <h2>Atmos Store</h2>
@@ -151,34 +146,38 @@ export default function Store() {
           </div>
         </div>
 
-        <div className="search-bar">
-          <span className="search-icon">🔍</span>
+        <div className="search-sort-bar">
           <input 
             type="text" 
-            placeholder="Buscar jogos ou desenvolvedoras..." 
+            className="store-search-input"
+            placeholder="Buscar jogos ou estúdios..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
         <div className="user-actions">
-          <div className="avatar-container">
-            <div className="user-avatar" onClick={() => setMenuAberto(!menuAberto)}>
+          <div className="avatar-container" style={{ position: 'relative' }}>
+            <div className="user-avatar" style={{ cursor: 'pointer', fontSize: '1.4rem' }} onClick={() => setMenuAberto(!menuAberto)}>
               👤
             </div>
             
             {menuAberto && (
-              <div className="avatar-dropdown">
-                <button className="dropdown-item" onClick={handleCriarJogo}>
-                  <span>➕</span> Criar Jogo
+              <div className="avatar-dropdown" style={{
+                position: 'absolute', right: 0, top: '40px', background: 'var(--bg-painel)',
+                border: '1px solid var(--border-suave)', padding: '0.8rem', borderRadius: '8px',
+                display: 'flex', flexDirection: 'column', gap: '0.5rem', zIndex: 200, width: '150px'
+              }}>
+                <button className="dropdown-item" onClick={handleCriarJogo} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem' }}>
+                  ➕ Criar Jogo
                 </button>
-                <hr className="dropdown-divider" />
-                <button className="dropdown-item" onClick={handleBiblioteca}>
-                  <span>📚</span> Biblioteca
+                <hr className="dropdown-divider" style={{ border: 'none', borderTop: '1px solid var(--border-suave)' }} />
+                <button className="dropdown-item" onClick={handleBiblioteca} style={{ background: 'none', border: 'none', color: '#fff', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem' }}>
+                  📚 Biblioteca
                 </button>
-                <hr className="dropdown-divider" />
-                <button className="dropdown-item logout" onClick={handleLogout}>
-                  <span>🚪</span> Sair
+                <hr className="dropdown-divider" style={{ border: 'none', borderTop: '1px solid var(--border-suave)' }} />
+                <button className="dropdown-item logout" onClick={handleLogout} style={{ background: 'none', border: 'none', color: 'var(--error)', textAlign: 'left', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 'bold' }}>
+                  🚪 Sair
                 </button>
               </div>
             )}
@@ -186,105 +185,103 @@ export default function Store() {
         </div>
       </header>
 
-      <div className="store-content">
-        <aside className="sidebar">
+      {/* ── CONTEÚDO PRINCIPAL (DOIS BLOCOS) ── */}
+      <div className="store-layout">
+        
+        {/* Sidebar Lateral de Gêneros */}
+        <aside className="filters-sidebar">
           <h3>Filtros</h3>
-          <h4 className="sidebar-subtitle">GÊNEROS</h4>
-          
-          <ul className="genre-list">
+          <div className="genre-list">
             {genres.map((genre) => (
-              <li 
+              <button 
                 key={genre.name} 
-                className={genre.name === selectedGenre ? 'active' : ''}
+                className={`genre-btn ${genre.name === selectedGenre ? 'active' : ''}`}
                 onClick={() => setSelectedGenre(genre.name)}
               >
-                <span className="genre-name">{genre.name}</span>
+                <span>{genre.name}</span>
                 <span className="genre-count">{genre.count}</span>
-              </li>
+              </button>
             ))}
-          </ul>
-
-          <div className="games-found-badge">
-            <strong>{processedGames.length}</strong> jogos exibidos
           </div>
         </aside>
 
-        <main className="games-grid-area">
-          <div className="grid-header">
-            <div className="header-titles">
-              <h2>{selectedGenre === 'Todos' ? 'Todos os Jogos' : `Jogos de ${selectedGenre}`}</h2>
-              <p>Mostrando {processedGames.length} de {games.length} jogos do catálogo</p>
+        {/* Seção do Catálogo de Cards */}
+        <main className="catalog-section">
+          <div className="catalog-header">
+            <div className="catalog-title">
+              <h1>{selectedGenre === 'Todos' ? 'Todos os Jogos' : `Jogos de ${selectedGenre}`}</h1>
+              <span>Mostrando {processedGames.length} de {games.length} títulos</span>
             </div>
-            <div className="header-sort">
-              <label>Ordenar por:</label>
-              <select value={sortOption} onChange={(e) => setSortOption(e.target.value)}>
+            
+            <div className="header-sort" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.85rem', color: 'var(--texto-secundario)' }}>Ordenar:</label>
+              <select 
+                value={sortOption} 
+                onChange={(e) => setSortOption(e.target.value)}
+                style={{ background: 'var(--bg-painel)', border: '1px solid var(--border-suave)', color: '#fff', padding: '0.4rem 0.8rem', borderRadius: '6px', outline: 'none' }}
+              >
                 <option value="Relevancia">Relevância</option>
-                <option value="A-Z">Ordem Alfabética (A-Z)</option>
-                <option value="Z-A">Ordem Alfabética (Z-A)</option>
+                <option value="A-Z">A-Z</option>
+                <option value="Z-A">Z-A</option>
               </select>
             </div>
           </div>
           
-          <div className="cards-container">
+          {/* Grid unificado com o novo layout */}
+          <div className="store-grid">
             {loading ? (
-              <p>Carregando catálogo do Railway...</p>
+              <p className="lib-status-message">Carregando catálogo da nuvem...</p>
             ) : processedGames.length === 0 ? (
-              <p className="no-games-message">Nenhum jogo encontrado com este filtro.</p>
+              <p className="lib-status-message">Nenhum jogo encontrado com este filtro.</p>
             ) : (
-              processedGames.map((game) => (
-                <div key={game.id} className="game-card">
-                  {/* MUDANÇA: Cursor pointer para indicar clique na imagem */}
-                  <div className="card-image-wrapper" style={{ cursor: 'pointer' }}>
-                    <img 
-                      src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
-                      alt={game.titulo || 'Jogo'}
-                      onClick={() => handleVerDetalhes(game.id)} // Clique leva para os detalhes
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
-                      }}
-                    />
-                    <button 
-                      className={`btn-favorite ${favorites.some(fav => fav.id === game.id) ? 'is-fav' : ''}`}
-                      onClick={() => toggleFavorite(game)}
-                    >
-                      {favorites.some(fav => fav.id === game.id) ? '⭐' : '☆'}
-                    </button>
-                  </div>
-                  
-                  <div className="card-info">
-                    {/* MUDANÇA: Título agora é clicável e tem efeito visual simples */}
-                    <h4 
-                      onClick={() => handleVerDetalhes(game.id)} 
-                      style={{ cursor: 'pointer' }}
-                      className="game-title-link"
-                    >
-                      {game.titulo || 'Jogo Desconhecido'}
-                    </h4>
-                    <p className="description">{game.descricao || 'Sem descrição cadastrada.'}</p>
-
-                    <div className="tags-area">
-                      {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
-                        <span key={idx} className="tag">{gen}</span>
-                      ))}
-                      {extrairNomesGeneros(game).length === 0 && (
-                        <span className="tag">Sem Gênero</span>
-                      )}
+              processedGames.map((game) => {
+                const isFav = favorites.some(fav => fav.id === game.id);
+                return (
+                  <div key={game.id} className="store-game-card">
+                    <div className="store-card-thumb">
+                      <img 
+                        src={game.capaUrl || 'https://placehold.co/600x350/1A1C23/A0AEC0?text=Sem+Capa'} 
+                        alt={game.titulo}
+                        onClick={() => handleVerDetalhes(game.id)}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://placehold.co/600x350/1A1C23/A0AEC0?text=Sem+Capa';
+                        }}
+                      />
+                      <button 
+                        className={`store-fav-badge ${isFav ? 'is-favorited' : ''}`}
+                        onClick={() => toggleFavorite(game)}
+                      >
+                        {isFav ? '⭐' : '☆'}
+                      </button>
                     </div>
+                    
+                    <div className="store-card-body">
+                      <h4 onClick={() => handleVerDetalhes(game.id)}>{game.titulo || 'Jogo Desconhecido'}</h4>
+                      <span className="dev-name">{game.desenvolvedora || 'Não informada'}</span>
+                      <p className="store-card-description">{game.descricao || 'Sem descrição cadastrada.'}</p>
 
-                    <div className="card-footer">
-                      <div className="developer-info">
-                        <span>Desenvolvedora</span>
-                        <strong>{game.desenvolvedora || 'Não informada'}</strong>
+                      <div className="store-card-tags">
+                        {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
+                          <span key={idx} className="store-tag">{gen}</span>
+                        ))}
+                        {extrairNomesGeneros(game).length === 0 && (
+                          <span className="store-tag">Geral</span>
+                        )}
                       </div>
-                      <div className="price-info">
-                        <span>Preço</span>
-                        <strong className="price-value">R$ {Number(game.preco || 0).toFixed(2)}</strong>
+
+                      <div className="store-card-footer">
+                        <span className="store-card-price">
+                          {Number(game.preco) === 0 ? 'Gratuito' : `R$ ${Number(game.preco || 0).toFixed(2)}`}
+                        </span>
+                        <button className="btn-view-details" onClick={() => handleVerDetalhes(game.id)}>
+                          Detalhes
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </main>

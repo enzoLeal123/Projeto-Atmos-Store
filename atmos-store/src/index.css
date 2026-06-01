@@ -1,3 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg-principal: #0d0e12;      /* Escuro profundo de fundo */
+  --bg-painel: #13151c;         /* Cor dos cards, headers e formulários */
+  --border-suave: #1f232e;      /* Divisórias e bordas discretas */
+  --texto-principal: #ffffff;   /* Branco puro para títulos */
+  --texto-secundario: #94a3b8;  /* Cinza azulado para descrições */
+  --texto-mutado: #475569;      /* Cinza escuro para labels e placeholders */
+  
+  /* Cores de Destaque */
+  --primary: #6366f1;           /* Roxo/Índigo moderno */
+  --primary-hover: #4f46e5;
+  --accent: #3b82f6;            /* Azul neon sutil para interações */
+  --warning: #f59e0b;           /* Laranja para preços e estrelas */
+  --error: #ef4444;             /* Vermelho para avisos */
+  --success: #10b981;           /* Verde para confirmações */
+  
+  --shadow-premium: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -7,5 +28,65 @@
 html, body, #root {
   width: 100%;
   min-height: 100vh;
-  background-color: #121418;
+  background-color: var(--bg-principal);
+  color: var(--texto-secundario);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar Personalizada para o site todo */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-principal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-suave);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--texto-mutated);
+}
+
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 3rem !important;
+  background-color: var(--bg-painel) !important;
+  border-bottom: 1px solid var(--border-suave) !important;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.logo-icon-bg {
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  padding: 0.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: var(--texto-principal) !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.logo-text span {
+  font-size: 0.75rem;
+  color: var(--texto-mutado) !important;
 }
