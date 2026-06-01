@@ -49,7 +49,7 @@ export default function CreateGame() {
           lancamento: form.lancamento.trim(),
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { token: token },
         }
       );
       setSucesso(true);
