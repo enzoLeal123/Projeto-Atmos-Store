@@ -26,7 +26,7 @@ export default function GameDetails() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Carrega jogo e recomendados
+  // Carrega jogo e recomendados (Isolado contra IDs inexistentes)
   useEffect(() => {
     const carregar = async () => {
       try {
@@ -38,6 +38,7 @@ export default function GameDetails() {
         if (jogoEncontrado) {
           setGame(jogoEncontrado);
 
+          // A lógica de recomendados agora SÓ roda se o jogo existir
           const generosAtuais = Array.isArray(jogoEncontrado.generos)
             ? jogoEncontrado.generos.map(g => g.nome.toLowerCase())
             : [];
@@ -48,14 +49,20 @@ export default function GameDetails() {
             return outros.some(gen => generosAtuais.includes(gen));
           });
           setRecommendedGames(recomendados.slice(0, 3));
+        } else {
+          setGame(null);
         }
       } catch (erro) {
         console.error('Erro ao carregar jogo:', erro);
+        setGame(null);
       } finally {
         setLoading(false);
       }
     };
-    carregar();
+    
+    if (id) {
+      carregar();
+    }
   }, [id]);
 
   // Carrega reviews da API
@@ -63,7 +70,6 @@ export default function GameDetails() {
     try {
       setLoadingReviews(true);
       const res = await axios.get(`${API_BASE}/jogos/${id}/reviews`);
-      // A API pode retornar array direto ou dentro de .itens / .data
       const lista = Array.isArray(res.data)
         ? res.data
         : res.data?.itens || res.data?.data || res.data?.reviews || [];
@@ -77,7 +83,9 @@ export default function GameDetails() {
   };
 
   useEffect(() => {
-    carregarReviews();
+    if (id) {
+      carregarReviews();
+    }
   }, [id]);
 
   const toggleFavorite = () => {
@@ -108,7 +116,6 @@ export default function GameDetails() {
       setRecomenda(true);
       setSucessoReview(true);
       setTimeout(() => setSucessoReview(false), 3000);
-      // Recarrega reviews após postar
       await carregarReviews();
     } catch (err) {
       const serverMsg =
@@ -122,25 +129,51 @@ export default function GameDetails() {
     }
   };
 
+  // Função ultra-protegida para tratar o objeto de usuário vindo da API
+  const getNomeUsuario = (rev) => {
+    if (rev.usuario && typeof rev.usuario === 'object') {
+      if (rev.usuario.nome) return rev.usuario.nome;
+      if (rev.usuario.name) return rev.usuario.name;
+    }
+    
+    if (typeof rev.usuario === 'string') return rev.usuario;
+    if (typeof rev.nomeUsuario === 'string') return rev.nomeUsuario;
+    if (typeof rev.autor === 'string') return rev.autor;
+
+    return 'Jogador Anônimo';
+  };
+
+  // 1º Bloqueio de segurança: Se estiver carregando, mostra o loading
   if (loading) return (
     <div className="gd-layout">
       <div className="gd-loading">Carregando...</div>
     </div>
   );
 
+  // 2º Bloqueio de segurança: Se a busca terminou e o jogo não existe, mostra a mensagem sem crashar
   if (!game) return (
     <div className="gd-layout">
+      <header className="store-header">
+        <div className="logo-area" style={{ cursor: 'pointer' }} onClick={() => navigate('/store')}>
+          <div className="logo-icon-bg">🎮</div>
+          <div className="logo-text">
+            <h2>Atmos Store</h2>
+            <span>Game Store</span>
+          </div>
+        </div>
+        <button className="gd-btn-back" onClick={() => navigate('/store')}>
+          ← Voltar para a Loja
+        </button>
+      </header>
       <div className="gd-loading">Jogo não encontrado.</div>
     </div>
   );
 
+  // Variáveis protegidas contra valores inesperados
   const isFavorited = favorites.some(f => f.id === game.id);
-  const totalRecomenda = reviews.filter(r => r.recomenda === true).length;
-  const pctRecomenda = reviews.length > 0 ? Math.round((totalRecomenda / reviews.length) * 100) : 0;
-
-  // Tenta extrair o nome do usuário de diferentes formatos da API
-  const getNomeUsuario = (rev) =>
-    rev.usuario?.nome || rev.usuario?.name || rev.nomeUsuario || rev.autor || 'Jogador Anônimo';
+  const listaReviews = Array.isArray(reviews) ? reviews : []; 
+  const totalRecomenda = listaReviews.filter(r => r.recomenda === true).length;
+  const pctRecomenda = listaReviews.length > 0 ? Math.round((totalRecomenda / listaReviews.length) * 100) : 0;
 
   return (
     <div className="gd-layout">
@@ -204,12 +237,12 @@ export default function GameDetails() {
             <button className="gd-btn-buy">Comprar Agora</button>
           </div>
 
-          {reviews.length > 0 && (
+          {listaReviews.length > 0 && (
             <div className="gd-score-bar">
               <span className="gd-score-label">
                 {pctRecomenda >= 80 ? '👍 Muito Positivo' : pctRecomenda >= 50 ? '😐 Misto' : '👎 Negativo'}
               </span>
-              <span className="gd-score-pct">{pctRecomenda}% recomendam ({reviews.length} avaliações)</span>
+              <span className="gd-score-pct">{pctRecomenda}% recomendam ({listaReviews.length} avaliações)</span>
               <div className="gd-score-track">
                 <div className="gd-score-fill" style={{ width: `${pctRecomenda}%` }} />
               </div>
@@ -293,16 +326,16 @@ export default function GameDetails() {
           <div className="gd-reviews-list">
             <h3>
               Análises mais recentes
-              {!loadingReviews && <span className="gd-reviews-count"> ({reviews.length})</span>}
+              {!loadingReviews && <span className="gd-reviews-count"> ({listaReviews.length})</span>}
             </h3>
 
             <div className="gd-reviews-scroll">
               {loadingReviews ? (
                 <p className="gd-no-reviews">Carregando avaliações...</p>
-              ) : reviews.length === 0 ? (
+              ) : listaReviews.length === 0 ? (
                 <p className="gd-no-reviews">Ainda não há avaliações. Seja o primeiro! 🎮</p>
               ) : (
-                reviews.map((rev, idx) => (
+                listaReviews.map((rev, idx) => (
                   <div key={rev.id || idx} className="gd-review-card">
                     <div className="gd-review-header">
                       <span className="gd-review-user">👤 {getNomeUsuario(rev)}</span>

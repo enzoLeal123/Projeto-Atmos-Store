@@ -8,7 +8,7 @@ const API_BASE = 'https://alunos-ads-api-production.up.railway.app';
 export default function CreateGame() {
   const navigate = useNavigate();
 
-  // Estados do formulário baseados nas classes do seu CSS
+  // Estados do formulário
   const [titulo, setTitulo] = useState('');
   const [descricao, setDescricao] = useState('');
   const [desenvolvedora, setDesenvolvedora] = useState('');
@@ -28,7 +28,6 @@ export default function CreateGame() {
     try {
       const token = localStorage.getItem('atmos_token');
       
-      // Envia os dados para a API
       await axios.post(
         `${API_BASE}/jogos`,
         {
@@ -36,9 +35,9 @@ export default function CreateGame() {
           descricao: descricao.trim(),
           desenvolvedora: desenvolvedora.trim(),
           preco: Number(preco) || 0,
-          lancamento: lancamento,
+          lancamento: lancamento.trim(),
           capaUrl: capaUrl.trim() || null,
-          generos: [] // Caso sua API exija uma array inicial de gêneros
+          generos: []
         },
         { headers: { token } }
       );
@@ -53,7 +52,6 @@ export default function CreateGame() {
     }
   };
 
-  // Se o jogo foi criado com sucesso, exibe a tela de sucesso configurada no seu CSS
   if (sucesso) {
     return (
       <div className="cg-layout">
@@ -86,7 +84,7 @@ export default function CreateGame() {
 
   return (
     <div className="cg-layout">
-      {/* ── HEADER ── */}
+      {/* ── HEADER (Idêntico ao original) ── */}
       <header className="store-header">
         <div className="logo-area" style={{ cursor: 'pointer' }} onClick={() => navigate('/store')}>
           <div className="logo-icon-bg">🎮</div>
@@ -96,50 +94,74 @@ export default function CreateGame() {
           </div>
         </div>
         <button className="cg-btn-back" onClick={() => navigate('/store')}>
-          ← Cancelar
+          ← Voltar para a Loja
         </button>
       </header>
 
       {/* ── CONTEÚDO ── */}
       <div className="cg-content">
-        {/* Sidebar de Dicas */}
+        {/* Sidebar com todas as 4 dicas originais recolocadas */}
         <aside className="cg-sidebar">
           <h3>Novo Jogo</h3>
-          <p>Preencha os dados ao lado para disponibilizar o seu jogo na Atmos Store de Muriaé.</p>
+          <p>Preencha as informações do jogo para adicioná-lo ao catálogo da Atmos Store.</p>
+          
           <div className="cg-tips">
             <div className="cg-tip">
-              <span>💡</span>
+              <span>📄</span>
               <div>
-                <strong>Imagens de Capa</strong>
-                <p>Utilize links de imagens hospedadas (ex: Imgur, Unsplash) para a capa aparecer corretamente.</p>
+                <strong>Título</strong>
+                <p>Use o nome oficial do jogo.</p>
+              </div>
+            </div>
+
+            <div className="cg-tip">
+              <span>💰</span>
+              <div>
+                <strong>Preço</strong>
+                <p>Use ponto como separador decimal. Ex: 59.90</p>
+              </div>
+            </div>
+
+            <div className="cg-tip">
+              <span>📅</span>
+              <div>
+                <strong>Lançamento</strong>
+                <p>Informe o ano. Ex: 2024</p>
+              </div>
+            </div>
+
+            <div className="cg-tip">
+              <span>🏢</span>
+              <div>
+                <strong>Desenvolvedora</strong>
+                <p>Nome do estúdio responsável.</p>
               </div>
             </div>
           </div>
         </aside>
 
-        {/* Formulário */}
+        {/* Formulário com a ordem e placeholders recuperados da imagem antiga */}
         <form className="cg-form" onSubmit={handleCriarJogo}>
-          <h2>Cadastrar Jogo</h2>
+          <h2>Informações do Jogo</h2>
 
           <div className="cg-field">
             <label>TÍTULO DO JOGO <span className="cg-required">*</span></label>
             <input 
               type="text" 
               required 
-              placeholder="Ex: Sekiro: Shadows Die Twice" 
+              placeholder="Ex: The Last of Us" 
               value={titulo}
               onChange={e => setTitulo(e.target.value)}
             />
           </div>
 
           <div className="cg-field">
-            <label>DESENVOLVEDORA <span className="cg-required">*</span></label>
-            <input 
-              type="text" 
+            <label>DESCRIÇÃO <span className="cg-required">*</span></label>
+            <textarea 
               required 
-              placeholder="Ex: FromSoftware" 
-              value={desenvolvedora}
-              onChange={e => setDesenvolvedora(e.target.value)}
+              placeholder="Descreva o jogo para os jogadores..." 
+              value={descricao}
+              onChange={e => setDescricao(e.target.value)}
             />
           </div>
 
@@ -150,20 +172,33 @@ export default function CreateGame() {
                 type="number" 
                 step="0.01" 
                 required 
-                placeholder="0.00" 
+                placeholder="Ex: 59.90" 
                 value={preco}
                 onChange={e => setPreco(e.target.value)}
               />
             </div>
+            
             <div className="cg-field">
-              <label>DATA DE LANÇAMENTO</label>
+              <label>ANO DE LANÇAMENTO <span className="cg-required">*</span></label>
               <input 
                 type="text" 
-                placeholder="Ex: 22/03/2019" 
+                required
+                placeholder="Ex: 2024" 
                 value={lancamento}
                 onChange={e => setLancamento(e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="cg-field">
+            <label>DESENVOLVEDORA <span className="cg-required">*</span></label>
+            <input 
+              type="text" 
+              required 
+              placeholder="Ex: Naughty Dog" 
+              value={desenvolvedora}
+              onChange={e => setDesenvolvedora(e.target.value)}
+            />
           </div>
 
           <div className="cg-field">
@@ -173,16 +208,6 @@ export default function CreateGame() {
               placeholder="https://exemplo.com/imagem.jpg" 
               value={capaUrl}
               onChange={e => setCapaUrl(e.target.value)}
-            />
-          </div>
-
-          <div className="cg-field">
-            <label>DESCRIÇÃO <span className="cg-required">*</span></label>
-            <textarea 
-              required 
-              placeholder="Fale um pouco sobre a história e mecânicas do jogo..." 
-              value={descricao}
-              onChange={e => setDescricao(e.target.value)}
             />
           </div>
 
@@ -198,7 +223,7 @@ export default function CreateGame() {
               Cancelar
             </button>
             <button type="submit" className="cg-btn-primary" disabled={enviando}>
-              {enviando ? 'Salvando...' : 'Salvar Jogo'}
+              {enviando ? 'Salvando...' : '🎮 Criar Jogo'}
             </button>
           </div>
         </form>
