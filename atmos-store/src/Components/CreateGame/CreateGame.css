@@ -1,0 +1,255 @@
+/* ── BASE ── */
+.cg-layout {
+  min-height: 100vh;
+  background-color: #121418;
+  color: #E2E8F0;
+  font-family: 'Inter', system-ui, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER (mesmo padrão da loja) ── */
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #1A1C23;
+  border-bottom: 1px solid #2D3748;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 0.8rem; }
+.logo-icon-bg { background-color: #5A67D8; padding: 0.5rem; border-radius: 8px; font-size: 1.5rem; }
+.logo-text h2 { margin: 0; font-size: 1.2rem; color: #fff; }
+.logo-text span { font-size: 0.75rem; color: #A0AEC0; }
+
+.cg-btn-back {
+  background: #2D3748;
+  border: 1px solid #4A5568;
+  color: #E2E8F0;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.cg-btn-back:hover { background: #4A5568; }
+
+/* ── CONTEÚDO ── */
+.cg-content {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2.5rem;
+  max-width: 1100px;
+  width: 100%;
+  margin: 3rem auto;
+  padding: 0 2rem;
+}
+
+/* ── SIDEBAR DE DICAS ── */
+.cg-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cg-sidebar h3 {
+  font-size: 1.4rem;
+  color: #fff;
+  margin: 0;
+}
+
+.cg-sidebar > p {
+  color: #A0AEC0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.cg-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.cg-tip {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  background: #1A1C23;
+  border: 1px solid #2D3748;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.cg-tip > span { font-size: 1.3rem; flex-shrink: 0; margin-top: 2px; }
+.cg-tip strong { display: block; color: #fff; font-size: 0.9rem; margin-bottom: 0.2rem; }
+.cg-tip p { margin: 0; color: #A0AEC0; font-size: 0.8rem; line-height: 1.4; }
+
+/* ── FORMULÁRIO ── */
+.cg-form {
+  background: #1A1C23;
+  border: 1px solid #2D3748;
+  border-radius: 16px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cg-form h2 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+  color: #fff;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #2D3748;
+}
+
+.cg-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cg-field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #A0AEC0;
+}
+
+.cg-required { color: #FC8181; }
+
+.cg-field input,
+.cg-field textarea {
+  background: #121418;
+  border: 1px solid #2D3748;
+  border-radius: 8px;
+  color: #fff;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+.cg-field input:focus,
+.cg-field textarea:focus {
+  outline: none;
+  border-color: #5A67D8;
+}
+
+.cg-field input::placeholder,
+.cg-field textarea::placeholder {
+  color: #4A5568;
+}
+
+.cg-field input:disabled,
+.cg-field textarea:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cg-field textarea { resize: vertical; min-height: 120px; }
+
+/* Linha dupla (preço + lançamento) */
+.cg-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+/* ── ERRO ── */
+.cg-error {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(252,129,129,0.1);
+  border: 1px solid rgba(252,129,129,0.4);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+}
+.cg-error span { font-size: 1rem; }
+.cg-error p { margin: 0; color: #FC8181; font-size: 0.85rem; }
+
+/* ── AÇÕES ── */
+.cg-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #2D3748;
+}
+
+.cg-btn-primary {
+  background: #5A67D8;
+  color: #fff;
+  border: none;
+  padding: 0.9rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+.cg-btn-primary:hover { background: #4C51BF; transform: translateY(-1px); }
+.cg-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.cg-btn-secondary {
+  background: transparent;
+  color: #A0AEC0;
+  border: 1px solid #4A5568;
+  padding: 0.9rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.cg-btn-secondary:hover { background: #2D3748; color: #fff; }
+.cg-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── TELA DE SUCESSO ── */
+.cg-success-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.cg-success-card {
+  background: #1A1C23;
+  border: 1px solid #2D3748;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cg-success-icon { font-size: 3.5rem; }
+.cg-success-card h2 { font-size: 1.6rem; color: #fff; margin: 0; }
+.cg-success-card p { color: #A0AEC0; margin: 0; font-size: 0.95rem; }
+.cg-success-card strong { color: #fff; }
+
+.cg-success-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ── RESPONSIVO ── */
+@media (max-width: 800px) {
+  .cg-content { grid-template-columns: 1fr; margin: 1.5rem auto; }
+  .cg-row { grid-template-columns: 1fr; }
+  .cg-form { padding: 1.5rem; }
+}
