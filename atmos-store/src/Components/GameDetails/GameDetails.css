@@ -384,3 +384,32 @@
   .gd-hero { height: 220px; }
   .gd-title { font-size: 1.6rem; }
 }
+
+/* ── FEEDBACK DO FORMULÁRIO DE REVIEW ── */
+.gd-review-error,
+.gd-review-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+}
+.gd-review-error {
+  background: rgba(252,129,129,0.1);
+  border: 1px solid rgba(252,129,129,0.4);
+}
+.gd-review-error p { margin: 0; color: #FC8181; }
+
+.gd-review-success {
+  background: rgba(72,187,120,0.1);
+  border: 1px solid rgba(72,187,120,0.4);
+}
+.gd-review-success p { margin: 0; color: #68D391; }
+
+/* Contador de reviews no título */
+.gd-reviews-count {
+  font-size: 0.85rem;
+  color: #A0AEC0;
+  font-weight: 400;
+}
