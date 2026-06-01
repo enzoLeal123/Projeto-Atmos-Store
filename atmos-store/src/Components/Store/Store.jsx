@@ -90,6 +90,8 @@ export default function Store() {
     localStorage.setItem('atmos_favorites', JSON.stringify(updatedFavorites));
   };
 
+  const handleCriarJogo = () => { navigate("/create-game"); };
+
   const handleBiblioteca = () => {
     navigate('/library');
   };
@@ -167,6 +169,10 @@ export default function Store() {
             
             {menuAberto && (
               <div className="avatar-dropdown">
+                <button className="dropdown-item" onClick={handleCriarJogo}>
+                  <span>➕</span> Criar Jogo
+                </button>
+                <hr className="dropdown-divider" />
                 <button className="dropdown-item" onClick={handleBiblioteca}>
                   <span>📚</span> Biblioteca
                 </button>
