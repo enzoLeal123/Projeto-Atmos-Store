@@ -12,65 +12,34 @@ export default function Library() {
   const [activeTab, setActiveTab] = useState('favorites');
   const [loadingCreated, setLoadingCreated] = useState(false);
 
-  // Recarrega os favoritos do localStorage
   useEffect(() => {
     const saved = localStorage.getItem('atmos_favorites');
-    if (saved) {
-      setFavorites(JSON.parse(saved));
-    }
+    if (saved) setFavorites(JSON.parse(saved));
   }, []);
 
-  // Busca os jogos da API e filtra de forma inteligente e dinâmica para qualquer usuário
   useEffect(() => {
     const carregarJogosCriados = async () => {
       try {
         setLoadingCreated(true);
         const token = localStorage.getItem('atmos_token');
-        const minhaMatricula = localStorage.getItem('atmos_matricula');
-        
-        if (!token || !minhaMatricula) {
-          console.warn("Aviso: Token ou Matrícula não encontrados no localStorage.");
-          return;
-        }
+        if (!token) return;
 
-        const resposta = await axios.get(`${API_BASE}/jogos?limite=100&limit=100`, {
+        // 1. Busca o id do usuário logado
+        const meRes = await axios.get(`${API_BASE}/auth/me`, {
           headers: { token }
         });
-        const listaJogos = resposta.data.itens || [];
+        const meuId = meRes.data?.id;
 
-        // 🔍 DEBUG: Abre o console do navegador (F12) para inspecionar a estrutura real dos dados da API
-        if (listaJogos.length > 0) {
-          console.log("Exemplo de estrutura de um jogo da API:", listaJogos[0]);
-          console.log("Sua matrícula ativa salva no front:", minhaMatricula);
-        }
+        // 2. Busca todos os jogos
+        const jogosRes = await axios.get(`${API_BASE}/jogos?limite=100&limit=100`);
+        const listaJogos = jogosRes.data.itens || [];
 
-        // FILTRO MULTICAMADAS: Varre as propriedades de matrícula e os fallbacks de texto
-        const meusJogos = listaJogos.filter(jogo => {
-          // 1. Tenta pegar propriedades estruturadas de matrícula que a API possa retornar
-          const m1 = jogo.usuario?.matricula;
-          const m2 = jogo.usuario_matricula;
-          const m3 = jogo.usuarioMatricula;
-          const m4 = jogo.matricula;
-          const m5 = jogo.criadoPor;
+        // 3. Filtra pelo autorId que bate com o id do usuário logado
+        const meusJogos = listaJogos.filter(jogo => String(jogo.autorId) === String(meuId));
 
-          // 2. Padroniza o ID/Matrícula do criador encontrado em string
-          const matriculaEncontrada = String(m1 || m2 || m3 || m4 || m5 || '').trim();
-          
-          // 3. Fallback baseado no campo de texto digitado no formulário de criação
-          const desenvolvedoraText = String(jogo.desenvolvedora || '').toLowerCase();
-
-          // Retorna verdadeiro se a matrícula bater com o usuário logado OU se a desenvolvedora for sua
-          return (
-            (matriculaEncontrada !== '' && matriculaEncontrada === minhaMatricula.trim()) ||
-            desenvolvedoraText.includes('muriaé') ||
-            desenvolvedoraText.includes('prefeitura')
-          );
-        });
-
-        console.log("Jogos filtrados encontrados para o usuário ativo:", meusJogos);
         setMyCreatedGames(meusJogos);
       } catch (erro) {
-        console.error('Erro ao carregar jogos criados de forma dinâmica:', erro);
+        console.error('Erro ao carregar jogos criados:', erro);
       } finally {
         setLoadingCreated(false);
       }
@@ -85,9 +54,7 @@ export default function Library() {
     localStorage.setItem('atmos_favorites', JSON.stringify(updated));
   };
 
-  const handleVerDetalhes = (id) => {
-    navigate(`/game/${id}`);
-  };
+  const handleVerDetalhes = (id) => navigate(`/game/${id}`);
 
   const extrairNomesGeneros = (game) => {
     if (Array.isArray(game.generos) && game.generos.length > 0) {
@@ -100,7 +67,6 @@ export default function Library() {
 
   return (
     <div className="library-layout">
-      {/* ── HEADER ── */}
       <header className="library-header">
         <div className="lib-logo" onClick={() => navigate('/store')}>
           <span className="logo-icon">🎮</span>
@@ -120,7 +86,6 @@ export default function Library() {
           <p>Gerencie seus títulos favoritos e os jogos desenvolvidos por você.</p>
         </div>
 
-        {/* ── ABAS DE NAVEGAÇÃO ── */}
         <div className="library-tabs">
           <button 
             className={`tab-btn ${activeTab === 'favorites' ? 'active' : ''}`}
@@ -136,7 +101,6 @@ export default function Library() {
           </button>
         </div>
 
-        {/* ── GRID DE JOGOS REESTILIZADO ── */}
         <div className="modern-grid">
           {activeTab === 'created' && loadingCreated ? (
             <p className="lib-status-message">Carregando seus projetos...</p>
@@ -171,7 +135,7 @@ export default function Library() {
                     <span className="card-dev-tag">{game.desenvolvedora || 'Indie Studio'}</span>
                   </div>
 
-                  <p className="card-excerpt">{game.descricao || 'Nenhuma descrição disponível para este título.'}</p>
+                  <p className="card-excerpt">{game.descricao || 'Nenhuma descrição disponível.'}</p>
 
                   <div className="card-meta-tags">
                     {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
