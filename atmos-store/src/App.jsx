@@ -33,6 +33,12 @@ function App() {
         <Route path="/create-game" element={
           <RotaProtegida><CreateGame /></RotaProtegida>
         } />
+
+        {/* ── NOVA ROTA ADICIONADA AQUI DENTRO ── */}
+        <Route path="/edit-game/:id" element={
+          <RotaProtegida><CreateGame /></RotaProtegida>
+        } />
+        
       </Routes>
     </Router>
   );

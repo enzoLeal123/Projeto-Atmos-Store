@@ -182,7 +182,6 @@
   width: 100%;
   height: 160px;
   overflow: hidden;
-  cursor: pointer;
 }
 
 .card-thumb-wrapper img {
@@ -194,6 +193,51 @@
 
 .modern-game-card:hover .card-thumb-wrapper img {
   transform: scale(1.05);
+}
+
+/* ── NOVO: CONTAINER DE BOTÕES DE EDIÇÃO/EXCLUSÃO NO TOPO DO CARD ── */
+.lib-card-actions-top {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 8px;
+  z-index: 20; /* Garante que fique acima da imagem */
+}
+
+/* Estilo base redondo (idêntico ao seu padrão de favorito) */
+.lib-btn-round {
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.2s, transform 0.2s, border-color 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Efeitos individuais de Hover */
+.lib-btn-edit:hover {
+  background: #3b82f6; /* Transiciona para o azul de edição */
+  border-color: #60a5fa;
+  transform: scale(1.1);
+}
+
+.lib-btn-delete:hover {
+  background: #ef4444; /* Transiciona para o vermelho destrutivo */
+  border-color: #f87171;
+  transform: scale(1.1);
+}
+
+.lib-btn-round:active {
+  transform: scale(0.95);
 }
 
 /* Botão de tirar dos favoritos rápido */
@@ -214,6 +258,7 @@
   cursor: pointer;
   font-size: 1rem;
   transition: background 0.2s, transform 0.2s;
+  z-index: 20;
 }
 
 .card-unfav-badge:hover {
@@ -236,7 +281,6 @@
   font-size: 1.1rem;
   color: #fff;
   font-weight: 700;
-  cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

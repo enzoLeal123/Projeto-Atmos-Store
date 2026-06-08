@@ -17,36 +17,57 @@ export default function Library() {
     if (saved) setFavorites(JSON.parse(saved));
   }, []);
 
+  // Função para recarregar a lista isoladamente após ações
+  const carregarJogosCriados = async () => {
+    try {
+      setLoadingCreated(true);
+      const token = localStorage.getItem('atmos_token');
+      if (!token) return;
+
+      // 1. Busca o id do usuário logado
+      const meRes = await axios.get(`${API_BASE}/auth/me`, {
+        headers: { token }
+      });
+      const meuId = meRes.data?.id;
+
+      // 2. Busca todos os jogos
+      const jogosRes = await axios.get(`${API_BASE}/jogos?limite=100&limit=100`);
+      const listaJogos = jogosRes.data.itens || [];
+
+      // 3. Filtra pelo autorId que bate com o id do usuário logado
+      const meusJogos = listaJogos.filter(jogo => String(jogo.autorId) === String(meuId));
+
+      setMyCreatedGames(meusJogos);
+    } catch (erro) {
+      console.error('Erro ao carregar jogos criados:', erro);
+    } finally {
+      setLoadingCreated(false);
+    }
+  };
+
   useEffect(() => {
-    const carregarJogosCriados = async () => {
-      try {
-        setLoadingCreated(true);
-        const token = localStorage.getItem('atmos_token');
-        if (!token) return;
-
-        // 1. Busca o id do usuário logado
-        const meRes = await axios.get(`${API_BASE}/auth/me`, {
-          headers: { token }
-        });
-        const meuId = meRes.data?.id;
-
-        // 2. Busca todos os jogos
-        const jogosRes = await axios.get(`${API_BASE}/jogos?limite=100&limit=100`);
-        const listaJogos = jogosRes.data.itens || [];
-
-        // 3. Filtra pelo autorId que bate com o id do usuário logado
-        const meusJogos = listaJogos.filter(jogo => String(jogo.autorId) === String(meuId));
-
-        setMyCreatedGames(meusJogos);
-      } catch (erro) {
-        console.error('Erro ao carregar jogos criados:', erro);
-      } finally {
-        setLoadingCreated(false);
-      }
-    };
-
     carregarJogosCriados();
   }, []);
+
+  // Lógica para excluir o jogo direto pelo card
+  const handleExcluirJogoDireto = async (id, titulo) => {
+    const confirmar = window.confirm(`Tem certeza que deseja excluir permanentemente o jogo "${titulo}"?`);
+    if (!confirmar) return;
+
+    try {
+      const token = localStorage.getItem('atmos_token');
+      await axios.delete(`${API_BASE}/jogos/${id}`, { 
+        headers: { token } 
+      });
+
+      alert('Jogo excluído com sucesso!');
+      // Atualiza o estado local para remover o jogo da tela sem recarregar tudo
+      setMyCreatedGames(prev => prev.filter(jogo => jogo.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao excluir o jogo. Verifique suas permissões.');
+    }
+  };
 
   const removeFavorite = (id) => {
     const updated = favorites.filter(game => game.id !== id);
@@ -55,6 +76,7 @@ export default function Library() {
   };
 
   const handleVerDetalhes = (id) => navigate(`/game/${id}`);
+  const handleEditarJogo = (id) => navigate(`/edit-game/${id}`);
 
   const extrairNomesGeneros = (game) => {
     if (Array.isArray(game.generos) && game.generos.length > 0) {
@@ -113,15 +135,41 @@ export default function Library() {
           ) : (
             jogosExibidos.map((game) => (
               <div key={game.id} className="modern-game-card">
-                <div className="card-thumb-wrapper" onClick={() => handleVerDetalhes(game.id)}>
+                
+                {/* O container da imagem agora possui a classe e os botões flutuantes superiores */}
+                <div className="card-thumb-wrapper">
+                  
+                  {/* Botões de Ação Superiores - Aparecem apenas na aba "Jogos que Criei" */}
+                  {activeTab === 'created' && (
+                    <div className="lib-card-actions-top">
+                      <button 
+                        className="lib-btn-round lib-btn-edit" 
+                        onClick={(e) => { e.stopPropagation(); handleEditarJogo(game.id); }}
+                        title="Editar Jogo"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        className="lib-btn-round lib-btn-delete" 
+                        onClick={(e) => { e.stopPropagation(); handleExcluirJogoDireto(game.id, game.titulo); }}
+                        title="Excluir Jogo"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  )}
+
                   <img 
                     src={game.capaUrl || 'https://placehold.co/600x350/1A1C23/A0AEC0?text=Sem+Capa'} 
                     alt={game.titulo}
+                    onClick={() => handleVerDetalhes(game.id)}
+                    style={{ cursor: 'pointer' }}
                     onError={(e) => {
                       e.target.onerror = null;
                       e.target.src = 'https://placehold.co/600x350/1A1C23/A0AEC0?text=Sem+Capa';
                     }}
                   />
+                  
                   {activeTab === 'favorites' && (
                     <button className="card-unfav-badge" onClick={(e) => { e.stopPropagation(); removeFavorite(game.id); }}>
                       ★
@@ -131,7 +179,9 @@ export default function Library() {
                 
                 <div className="card-details">
                   <div className="card-header-info">
-                    <h4 onClick={() => handleVerDetalhes(game.id)}>{game.titulo || 'Sem Título'}</h4>
+                    <h4 onClick={() => handleVerDetalhes(game.id)} style={{ cursor: 'pointer' }}>
+                      {game.titulo || 'Sem Título'}
+                    </h4>
                     <span className="card-dev-tag">{game.desenvolvedora || 'Indie Studio'}</span>
                   </div>
 
