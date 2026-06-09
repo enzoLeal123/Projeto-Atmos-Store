@@ -8,15 +8,11 @@ export default function Store() {
   const [games, setGames] = useState([]);
   const [genres, setGenres] = useState([]); 
   const [loading, setLoading] = useState(true);
-  
   const [selectedGenre, setSelectedGenre] = useState('Todos');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('Relevancia');
-
   const [menuAberto, setMenuAberto] = useState(false);
   const [nomeUsuario, setNomeUsuario] = useState('');
-
-  // NOVO: Estado inicializado buscando os favoritos já salvos no localStorage
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('atmos_favorites');
     return saved ? JSON.parse(saved) : [];
@@ -38,16 +34,14 @@ export default function Store() {
     buscarUsuario();
   }, []);
 
+  // Busca os jogos da API
   useEffect(() => {
     const buscarDadosDaAPI = async () => {
       try {
         setLoading(true);
-        
         const URL_BASE = 'https://alunos-ads-api-production.up.railway.app/jogos?limite=100&limit=100';
-
         const respostaJogos = await axios.get(URL_BASE);
         const jogosRecebidos = respostaJogos.data.itens || []; 
-        
         setGames(jogosRecebidos);
 
         const contagemGeneros = {};
@@ -63,9 +57,7 @@ export default function Store() {
           } else {
             listaNomesGeneros.forEach(generoNome => {
               const nomeFormatado = generoNome.charAt(0).toUpperCase() + generoNome.slice(1).toLowerCase();
-              if (!contagemGeneros[nomeFormatado]) {
-                contagemGeneros[nomeFormatado] = 0;
-              }
+              if (!contagemGeneros[nomeFormatado]) contagemGeneros[nomeFormatado] = 0;
               contagemGeneros[nomeFormatado]++;
             });
           }
@@ -73,16 +65,9 @@ export default function Store() {
 
         const listaSidebar = [
           { name: 'Todos', count: jogosRecebidos.length },
-          ...Object.keys(contagemGeneros).sort().map(nome => ({
-            name: nome,
-            count: contagemGeneros[nome]
-          }))
+          ...Object.keys(contagemGeneros).sort().map(nome => ({ name: nome, count: contagemGeneros[nome] }))
         ];
-
-        if (semGeneroCount > 0) {
-          listaSidebar.push({ name: 'Outros', count: semGeneroCount });
-        }
-
+        if (semGeneroCount > 0) listaSidebar.push({ name: 'Outros', count: semGeneroCount });
         setGenres(listaSidebar);
 
       } catch (erro) {
@@ -91,40 +76,24 @@ export default function Store() {
         setLoading(false);
       }
     };
-
     buscarDadosDaAPI();
   }, []);
 
-  // NOVO: Função para adicionar ou remover um jogo dos favoritos
   const toggleFavorite = (game) => {
-    let updatedFavorites;
-    if (favorites.some(fav => fav.id === game.id)) {
-      updatedFavorites = favorites.filter(fav => fav.id !== game.id);
-    } else {
-      updatedFavorites = [...favorites, game];
-    }
+    const updatedFavorites = favorites.some(fav => fav.id === game.id)
+      ? favorites.filter(fav => fav.id !== game.id)
+      : [...favorites, game];
     setFavorites(updatedFavorites);
     localStorage.setItem('atmos_favorites', JSON.stringify(updatedFavorites));
   };
 
-  const handleBiblioteca = () => {
-    navigate('/library');
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('atmos_token');
-    navigate('/');
-  };
-
-  // NOVO: Redireciona para a tela de detalhes passando o ID do jogo na URL
-  const handleVerDetalhes = (id) => {
-    navigate(`/game/${id}`);
-  };
+  const handleBiblioteca = () => navigate('/library');
+  const handleCriarJogo = () => navigate('/create-game');
+  const handleLogout = () => { localStorage.removeItem('atmos_token'); navigate('/'); };
+  const handleVerDetalhes = (id) => navigate(`/game/${id}`);
 
   const extrairNomesGeneros = (game) => {
-    if (Array.isArray(game.generos) && game.generos.length > 0) {
-      return game.generos.map(g => g.nome); 
-    }
+    if (Array.isArray(game.generos) && game.generos.length > 0) return game.generos.map(g => g.nome);
     return [];
   };
 
@@ -142,18 +111,13 @@ export default function Store() {
   if (selectedGenre !== 'Todos') {
     processedGames = processedGames.filter(game => {
       const listaGeneros = extrairNomesGeneros(game).map(g => g.toLowerCase());
-      if (selectedGenre === 'Outros') {
-        return listaGeneros.length === 0;
-      }
+      if (selectedGenre === 'Outros') return listaGeneros.length === 0;
       return listaGeneros.includes(selectedGenre.toLowerCase());
     });
   }
 
-  if (sortOption === 'A-Z') {
-    processedGames.sort((a, b) => String(a.titulo || '').localeCompare(String(b.titulo || '')));
-  } else if (sortOption === 'Z-A') {
-    processedGames.sort((a, b) => String(b.titulo || '').localeCompare(String(a.titulo || '')));
-  }
+  if (sortOption === 'A-Z') processedGames.sort((a, b) => String(a.titulo || '').localeCompare(String(b.titulo || '')));
+  else if (sortOption === 'Z-A') processedGames.sort((a, b) => String(b.titulo || '').localeCompare(String(a.titulo || '')));
 
   return (
     <div className="store-layout">
@@ -190,6 +154,9 @@ export default function Store() {
                 <button className="dropdown-item" onClick={handleBiblioteca}>
                   <span>📚</span> Biblioteca
                 </button>
+                <button className="dropdown-item" onClick={handleCriarJogo}>
+                  <span>➕</span> Criar Jogo
+                </button>
                 <hr className="dropdown-divider" />
                 <button className="dropdown-item logout" onClick={handleLogout}>
                   <span>🚪</span> Sair
@@ -204,7 +171,6 @@ export default function Store() {
         <aside className="sidebar">
           <h3>Filtros</h3>
           <h4 className="sidebar-subtitle">GÊNEROS</h4>
-          
           <ul className="genre-list">
             {genres.map((genre) => (
               <li 
@@ -217,7 +183,6 @@ export default function Store() {
               </li>
             ))}
           </ul>
-
           <div className="games-found-badge">
             <strong>{processedGames.length}</strong> jogos exibidos
           </div>
@@ -247,16 +212,12 @@ export default function Store() {
             ) : (
               processedGames.map((game) => (
                 <div key={game.id} className="game-card">
-                  {/* MUDANÇA: Cursor pointer para indicar clique na imagem */}
                   <div className="card-image-wrapper" style={{ cursor: 'pointer' }}>
                     <img 
                       src={game.capaUrl || 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'} 
                       alt={game.titulo || 'Jogo'}
-                      onClick={() => handleVerDetalhes(game.id)} // Clique leva para os detalhes
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa';
-                      }}
+                      onClick={() => handleVerDetalhes(game.id)}
+                      onError={(e) => { e.target.onerror = null; e.target.src = 'https://placehold.co/600x350/2D3748/A0AEC0?text=Sem+Capa'; }}
                     />
                     <button 
                       className={`btn-favorite ${favorites.some(fav => fav.id === game.id) ? 'is-fav' : ''}`}
@@ -267,7 +228,6 @@ export default function Store() {
                   </div>
                   
                   <div className="card-info">
-                    {/* MUDANÇA: Título agora é clicável e tem efeito visual simples */}
                     <h4 
                       onClick={() => handleVerDetalhes(game.id)} 
                       style={{ cursor: 'pointer' }}
@@ -281,9 +241,7 @@ export default function Store() {
                       {extrairNomesGeneros(game).slice(0, 2).map((gen, idx) => (
                         <span key={idx} className="tag">{gen}</span>
                       ))}
-                      {extrairNomesGeneros(game).length === 0 && (
-                        <span className="tag">Sem Gênero</span>
-                      )}
+                      {extrairNomesGeneros(game).length === 0 && <span className="tag">Sem Gênero</span>}
                     </div>
 
                     <div className="card-footer">
