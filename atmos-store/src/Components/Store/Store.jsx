@@ -119,6 +119,8 @@ export default function Store() {
 
   if (sortOption === 'A-Z') processedGames.sort((a, b) => String(a.titulo || '').localeCompare(String(b.titulo || '')));
   else if (sortOption === 'Z-A') processedGames.sort((a, b) => String(b.titulo || '').localeCompare(String(a.titulo || '')));
+  else if (sortOption === 'preco-asc') processedGames.sort((a, b) => Number(a.preco || 0) - Number(b.preco || 0));
+  else if (sortOption === 'preco-desc') processedGames.sort((a, b) => Number(b.preco || 0) - Number(a.preco || 0));
 
   return (
     <div className="store-layout">
@@ -204,13 +206,32 @@ export default function Store() {
                 <option value="Relevancia">Relevância</option>
                 <option value="A-Z">Ordem Alfabética (A-Z)</option>
                 <option value="Z-A">Ordem Alfabética (Z-A)</option>
+                <option value="preco-asc">Menor Preço</option>
+                <option value="preco-desc">Maior Preço</option>
               </select>
             </div>
           </div>
           
           <div className="cards-container">
             {loading ? (
-              <p>Carregando catálogo do Railway...</p>
+              Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="game-card skeleton-card">
+                  <div className="skeleton skeleton-img" />
+                  <div className="card-info">
+                    <div className="skeleton skeleton-title" />
+                    <div className="skeleton skeleton-text" />
+                    <div className="skeleton skeleton-text short" />
+                    <div className="skeleton-tags">
+                      <div className="skeleton skeleton-tag" />
+                      <div className="skeleton skeleton-tag" />
+                    </div>
+                    <div className="skeleton-footer">
+                      <div className="skeleton skeleton-text short" />
+                      <div className="skeleton skeleton-price" />
+                    </div>
+                  </div>
+                </div>
+              ))
             ) : processedGames.length === 0 ? (
               <p className="no-games-message">Nenhum jogo encontrado com este filtro.</p>
             ) : (

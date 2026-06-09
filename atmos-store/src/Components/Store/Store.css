@@ -508,3 +508,76 @@
   color: var(--color-accent-2);
   font-weight: 700;
 }
+
+/* ══════════════════════════════════════════
+   SKELETON LOADING
+══════════════════════════════════════════ */
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface-2) 25%,
+    var(--color-surface-3) 50%,
+    var(--color-surface-2) 75%
+  );
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton-img {
+  height: 170px;
+  width: 100%;
+  border-radius: 0;
+}
+
+.skeleton-title {
+  height: 16px;
+  width: 75%;
+  margin-bottom: 8px;
+}
+
+.skeleton-text {
+  height: 12px;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.skeleton-text.short {
+  width: 55%;
+}
+
+.skeleton-tags {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0;
+}
+
+.skeleton-tag {
+  height: 20px;
+  width: 60px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
+}
+
+.skeleton-price {
+  height: 20px;
+  width: 70px;
+  border-radius: var(--radius-sm);
+}
