@@ -1,0 +1,297 @@
+/* ══════════════════════════════════════════
+   PROFILE
+══════════════════════════════════════════ */
+.pf-layout {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text-1);
+  font-family: var(--font);
+  display: flex;
+  flex-direction: column;
+}
+
+.pf-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-3);
+  font-size: 0.9rem;
+}
+
+/* Header — reutiliza .store-header do Store.css */
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+  height: 64px;
+  background: rgba(10,11,15,0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 0.75rem; }
+.logo-icon-bg {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+}
+.logo-text h2 { margin: 0; font-size: 1rem; font-weight: 700; }
+.logo-text span { font-size: 0.7rem; color: var(--color-text-3); }
+
+/* Botões header */
+.pf-btn-secondary {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-mid);
+  color: var(--color-text-2);
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.pf-btn-secondary:hover { background: var(--color-surface-3); color: var(--color-text-1); }
+
+.pf-btn-logout {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #fca5a5;
+  padding: 0.5rem 1.1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+.pf-btn-logout:hover { background: rgba(239,68,68,0.2); }
+.pf-btn-logout.full { width: 100%; padding: 0.8rem; border-radius: var(--radius-md); font-size: 0.9rem; font-weight: 600; margin-top: 0.5rem; }
+
+/* ── LAYOUT PRINCIPAL ── */
+.pf-content {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  max-width: 1300px;
+  width: 100%;
+  margin: 2.5rem auto;
+  padding: 0 2rem;
+}
+
+/* Card base */
+.pf-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+/* ── COLUNA ESQUERDA ── */
+.pf-left { display: flex; flex-direction: column; gap: 1rem; }
+
+/* Identity card */
+.pf-identity { display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
+
+.pf-avatar {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 0 30px rgba(99,102,241,0.4);
+  flex-shrink: 0;
+}
+
+.pf-identity-info { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+
+.pf-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--color-text-1);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.pf-role-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid;
+  letter-spacing: 0.5px;
+}
+
+.pf-meta { width: 100%; display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem; }
+
+.pf-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  text-align: left;
+}
+.pf-meta-item span { font-size: 0.72rem; color: var(--color-text-3); }
+.pf-meta-item strong { font-size: 0.88rem; color: var(--color-text-1); font-weight: 600; }
+
+/* Stats */
+.pf-stats h3 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-text-3); margin: 0 0 1rem; }
+
+.pf-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.pf-stat {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  text-align: center;
+  transition: border-color var(--transition);
+}
+.pf-stat:hover { border-color: var(--color-accent); }
+.pf-stat strong { font-size: 1.6rem; font-weight: 900; color: var(--color-accent-2); letter-spacing: -1px; }
+.pf-stat span { font-size: 0.72rem; color: var(--color-text-3); }
+
+/* Quick actions */
+.pf-quick-actions h3 { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--color-text-3); margin: 0 0 1rem; }
+
+.pf-action-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  margin-bottom: 0.5rem;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+  font-family: var(--font);
+}
+.pf-action-btn:last-child { margin-bottom: 0; }
+.pf-action-btn:hover { background: var(--color-surface-3); border-color: var(--color-border-mid); transform: translateX(3px); }
+.pf-action-btn > span { font-size: 1.3rem; flex-shrink: 0; }
+.pf-action-btn strong { display: block; font-size: 0.88rem; color: var(--color-text-1); margin-bottom: 2px; }
+.pf-action-btn p { margin: 0; font-size: 0.75rem; color: var(--color-text-3); }
+
+/* ── COLUNA DIREITA ── */
+.pf-right { display: flex; flex-direction: column; gap: 1rem; }
+
+.pf-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+}
+.pf-section-header h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-text-1); margin: 0; }
+.pf-count {
+  font-size: 0.75rem;
+  background: rgba(99,102,241,0.15);
+  color: var(--color-accent-2);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(99,102,241,0.3);
+  font-weight: 600;
+}
+
+/* Lista de jogos */
+.pf-games-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.pf-game-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), transform var(--transition);
+}
+.pf-game-item:hover { background: var(--color-surface-3); border-color: var(--color-border-mid); transform: translateX(3px); }
+
+.pf-game-thumb {
+  width: 80px; height: 56px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--color-surface-3);
+}
+.pf-game-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.pf-game-info { flex: 1; min-width: 0; }
+.pf-game-info h4 { font-size: 0.9rem; font-weight: 700; color: var(--color-text-1); margin: 0 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pf-game-info p { font-size: 0.75rem; color: var(--color-text-3); margin: 0 0 6px; line-height: 1.4; }
+
+.pf-game-meta { display: flex; gap: 5px; flex-wrap: wrap; }
+.pf-tag {
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border-mid);
+  padding: 1px 7px;
+  border-radius: var(--radius-full);
+  font-size: 0.65rem;
+  color: var(--color-text-2);
+}
+
+.pf-game-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.pf-game-price strong { font-size: 0.95rem; font-weight: 800; color: var(--color-price); }
+.pf-game-price span { font-size: 0.7rem; color: var(--color-text-3); }
+
+/* Empty state */
+.pf-empty { color: var(--color-text-3); font-size: 0.85rem; text-align: center; padding: 2rem 0; }
+
+.pf-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+.pf-empty-state > span { font-size: 2.5rem; }
+.pf-empty-state p { color: var(--color-text-3); font-size: 0.9rem; margin: 0; }
+
+.pf-btn-primary {
+  background: linear-gradient(135deg, var(--color-accent), #8b5cf6);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: opacity var(--transition), transform var(--transition);
+}
+.pf-btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+/* Responsivo */
+@media (max-width: 900px) {
+  .pf-content { grid-template-columns: 1fr; padding: 0 1rem; margin: 1.5rem auto; }
+}

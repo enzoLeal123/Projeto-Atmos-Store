@@ -87,7 +87,8 @@ export default function Store() {
     localStorage.setItem('atmos_favorites', JSON.stringify(updatedFavorites));
   };
 
-  const handleBiblioteca = () => navigate('/library');
+  const handleBiblioteca = () => navigate("/library");
+  const handlePerfil = () => navigate("/profile");
   const handleCriarJogo = () => navigate('/create-game');
   const handleLogout = () => { localStorage.removeItem('atmos_token'); navigate('/'); };
   const handleVerDetalhes = (id) => navigate(`/game/${id}`);
@@ -151,6 +152,9 @@ export default function Store() {
                 <div className="dropdown-greeting">
                   <span>👋 Olá, <strong>{nomeUsuario}</strong></span>
                 </div>
+                <button className="dropdown-item" onClick={handlePerfil}>
+                  <span>👤</span> Meu Perfil
+                </button>
                 <button className="dropdown-item" onClick={handleBiblioteca}>
                   <span>📚</span> Biblioteca
                 </button>

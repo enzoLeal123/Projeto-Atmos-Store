@@ -5,6 +5,7 @@ import Store from './components/Store/Store';
 import Library from './components/Library/Library';
 import GameDetails from './components/GameDetails/GameDetails.jsx';
 import CreateGame from './components/CreateGame/CreateGame.jsx';
+import Profile from './components/Profile/Profile.jsx';
 
 function RotaProtegida({ children }) {
   const token = localStorage.getItem('atmos_token');
@@ -17,28 +18,11 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
-
-        <Route path="/store" element={
-          <RotaProtegida><Store /></RotaProtegida>
-        } />
-
-        <Route path="/library" element={
-          <RotaProtegida><Library /></RotaProtegida>
-        } />
-
-        <Route path="/game/:id" element={
-          <RotaProtegida><GameDetails /></RotaProtegida>
-        } />
-
-        <Route path="/create-game" element={
-          <RotaProtegida><CreateGame /></RotaProtegida>
-        } />
-
-        {/* ── NOVA ROTA ADICIONADA AQUI DENTRO ── */}
-        <Route path="/edit-game/:id" element={
-          <RotaProtegida><CreateGame /></RotaProtegida>
-        } />
-        
+        <Route path="/store" element={<RotaProtegida><Store /></RotaProtegida>} />
+        <Route path="/library" element={<RotaProtegida><Library /></RotaProtegida>} />
+        <Route path="/game/:id" element={<RotaProtegida><GameDetails /></RotaProtegida>} />
+        <Route path="/create-game" element={<RotaProtegida><CreateGame /></RotaProtegida>} />
+        <Route path="/profile" element={<RotaProtegida><Profile /></RotaProtegida>} />
       </Routes>
     </Router>
   );
